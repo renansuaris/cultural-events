@@ -1,0 +1,93 @@
+{
+  "categories": [
+    {
+      "id": "1",
+      "name": "Música"
+    },
+    {
+      "id": "2",
+      "name": "Teatro"
+    },
+    {
+      "id": "3",
+      "name": "Arte e Artesanato"
+    }
+  ],
+  "users": [
+    {
+      "id": "1",
+      "name": "Admin",
+      "email": "admin@email.com",
+      "password": "123",
+      "role": "admin"
+    },
+    {
+      "id": "2",
+      "name": "Renan Alencar",
+      "email": "renan@email.com",
+      "password": "123",
+      "role": "user"
+    },
+    {
+      "id": "38e4",
+      "name": "Joao Silva",
+      "email": "joaosilva@gmail.com",
+      "password": "12345678",
+      "role": "user"
+    },
+    {
+      "id": "4fc5",
+      "name": "Joao Feijao",
+      "email": "joaofeijao@gmail.com",
+      "password": "12345678",
+      "role": "user"
+    }
+  ],
+  "events": [
+    {
+      "id": "2",
+      "title": "Peça de Teatro: O Riso",
+      "date": "30/10/2025",
+      "location": "Teatro Municipal",
+      "description": "Uma comédia que vai fazer toda a família rir do começo ao fim.",
+      "userId": 2,
+      "categoryId": 2
+    },
+    {
+      "id": "3",
+      "title": "Feira de Artesanato e Comida",
+      "date": "05/11/2025",
+      "location": "Parque da Cidade",
+      "description": "Venha conferir o trabalho dos artesãos locais e provar comidas deliciosas.",
+      "userId": 2,
+      "categoryId": 3
+    },
+    {
+      "id": "e8fc",
+      "title": "Ceará Tech Summit",
+      "date": "25/11/2025 às 14:00",
+      "location": "UFC",
+      "description": "Vem aí o Ceará Tech Summit 2025!",
+      "userId": 1,
+      "categoryId": 1
+    },
+    {
+      "id": "90a8",
+      "title": "Festa",
+      "date": "",
+      "location": "",
+      "description": "",
+      "userId": 1,
+      "categoryId": 1
+    },
+    {
+      "id": "5c77",
+      "title": "Festa na cabana",
+      "date": "09/08/2026",
+      "location": "Estadio",
+      "description": "",
+      "userId": "4fc5",
+      "categoryId": "1"
+    }
+  ]
+}

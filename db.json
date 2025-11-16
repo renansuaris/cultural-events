@@ -6,11 +6,23 @@
     },
     {
       "id": "2",
-      "name": "Teatro"
+      "name": "Teatro & Dança"
     },
     {
       "id": "3",
-      "name": "Arte e Artesanato"
+      "name": "Arte & Exposições"
+    },
+    {
+      "id": "4",
+      "name": "Workshops & Palestras"
+    },
+    {
+      "id": "5",
+      "name": "Gastronomia"
+    },
+    {
+      "id": "4a03",
+      "name": "Outro"
     }
   ],
   "users": [
@@ -45,49 +57,40 @@
   ],
   "events": [
     {
-      "id": "2",
-      "title": "Peça de Teatro: O Riso",
-      "date": "30/10/2025",
-      "location": "Teatro Municipal",
-      "description": "Uma comédia que vai fazer toda a família rir do começo ao fim.",
-      "userId": 2,
-      "categoryId": 2
-    },
-    {
-      "id": "3",
-      "title": "Feira de Artesanato e Comida",
-      "date": "05/11/2025",
-      "location": "Parque da Cidade",
-      "description": "Venha conferir o trabalho dos artesãos locais e provar comidas deliciosas.",
-      "userId": 2,
-      "categoryId": 3
-    },
-    {
-      "id": "e8fc",
-      "title": "Ceará Tech Summit",
-      "date": "25/11/2025 às 14:00",
+      "id": "96dd",
+      "title": "Show de Música UFC",
+      "date": "12/12/2025 às 17:00",
       "location": "UFC",
-      "description": "Vem aí o Ceará Tech Summit 2025!",
-      "userId": 1,
-      "categoryId": 1
+      "description": "Com show musical da banda.",
+      "categoryId": "1",
+      "userId": "1"
     },
     {
-      "id": "90a8",
-      "title": "Festa",
-      "date": "",
-      "location": "",
-      "description": "",
-      "userId": 1,
-      "categoryId": 1
+      "id": "0566",
+      "title": "Campeonato de Clash Royale",
+      "date": "30/12/2025",
+      "location": "Sala Multiuso",
+      "description": "Taxa de inscrição 5R$",
+      "categoryId": "4a03",
+      "userId": "1"
     },
     {
-      "id": "5c77",
-      "title": "Festa na cabana",
-      "date": "09/08/2026",
-      "location": "Estadio",
-      "description": "",
-      "userId": "4fc5",
-      "categoryId": "1"
+      "id": "d803",
+      "title": "Festa na Cabana",
+      "date": "14/12/2025",
+      "location": "Casa do Cupim",
+      "description": "Inscrição 30R$",
+      "categoryId": "1",
+      "userId": "1"
+    },
+    {
+      "id": "aafc",
+      "title": "Festa de Halloween",
+      "date": "01/01/2026",
+      "location": "Praia do Futuro",
+      "description": "Vai ser top",
+      "categoryId": "1",
+      "userId": "4fc5"
     }
   ]
 }

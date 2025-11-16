@@ -17,6 +17,7 @@ type CreateEventData = {
   date: string
   location: string
   description: string
+  categoryId: string
 }
 
 type UpdateEventData = {
@@ -69,8 +70,7 @@ export const useEventStore = defineStore('event', () => {
 
     const fullEventData = {
       ...eventData,
-      userId: currentUserId, 
-      categoryId: '1'
+      userId: currentUserId
     }
 
     try {

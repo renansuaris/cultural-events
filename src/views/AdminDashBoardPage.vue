@@ -1,27 +1,27 @@
 <template>
-  <main>
-    <h1>Página de Admin Dashboard</h1>
-    <p>Selecione uma área para gerenciar:</p>
+  <main class="container">
+    <h1>Painel do Administrador</h1>
+    <p class="subtitle">Bem vindo, Admin. Selecione uma área para gerenciar:</p>
 
-    <nav class="admin-nav">
-      <ul>
-        <li>
-          <RouterLink :to="{ name: 'admin-events' }">
-            Gerenciar Eventos
-          </RouterLink>
-        </li>
-        <li>
-          <RouterLink :to="{ name: 'admin-users' }">
-            Gerenciar Usuários
-          </RouterLink>
-        </li>
-        <li>
-          <RouterLink :to="{ name: 'admin-categories' }">
-            Gerenciar Categorias
-          </RouterLink>
-        </li>
-      </ul>
-    </nav>
+    <div class="dashboard-grid">
+      <RouterLink :to="{ name: 'admin-events' }" class="dashboard-card">
+        <div class="card-icon">📅</div>
+        <h3>Gerenciar Eventos</h3>
+        <p>Visualize, edite ou remova qualquer evento da plataforma.</p>
+      </RouterLink>
+
+      <RouterLink :to="{ name: 'admin-users' }" class="dashboard-card">
+        <div class="card-icon">👥</div>
+        <h3>Gerenciar Usuários</h3>
+        <p>Veja os usuários cadastrados e gerencie permissões.</p>
+      </RouterLink>
+
+      <RouterLink :to="{ name: 'admin-categories' }" class="dashboard-card">
+        <div class="card-icon">🏷️</div>
+        <h3>Gerenciar Categorias</h3>
+        <p>Crie ou remova categorias para os eventos.</p>
+      </RouterLink>
+    </div>
   </main>
 </template>
 
@@ -30,24 +30,62 @@ import { RouterLink } from 'vue-router'
 </script>
 
 <style scoped>
-.admin-nav ul {
-  list-style: none;
-  padding: 0;
+.container {
+  max-width: 1200px;
+  margin: 2rem auto;
+  padding: 1rem;
 }
-.admin-nav li {
+
+h1 {
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.dashboard-card {
+  background-color: #fff;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s, box-shadow 0.2s;
+  border: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+  border-color: #007bff;
+}
+
+.card-icon {
+  font-size: 2.5rem;
   margin-bottom: 1rem;
 }
-.admin-nav a {
-  display: block;
-  padding: 1rem;
-  background-color: #f0f0f0;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  text-decoration: none;
-  color: #333;
-  font-weight: bold;
+
+.dashboard-card h3 {
+  margin: 0 0 0.5rem 0;
+  color: #007bff;
 }
-.admin-nav a:hover {
-  background-color: #e9e9e9;
+
+.dashboard-card p {
+  margin: 0;
+  color: #666;
+  line-height: 1.5;
+  font-size: 0.95rem;
 }
 </style>

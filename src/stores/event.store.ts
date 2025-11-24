@@ -1,6 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useAuthStore } from './auth'
+import { type ICategory } from './category.store'
 
 export interface IEvent {
   id: string
@@ -10,6 +11,7 @@ export interface IEvent {
   description: string
   userId: string 
   categoryId: string
+  category?: ICategory
 }
 
 type CreateEventData = {
@@ -36,7 +38,7 @@ export const useEventStore = defineStore('event', () => {
 
   async function fetchAllEvents() {
     try {
-      const response = await fetch(`${API_URL}/events`)
+      const response = await fetch(`${API_URL}/events?_expand=category`)
       if (!response.ok) {
         throw new Error('Erro ao buscar eventos')
       }
@@ -49,7 +51,7 @@ export const useEventStore = defineStore('event', () => {
   async function fetchEventById(id: string) {
     currentEvent.value = null 
     try {
-      const response = await fetch(`${API_URL}/events/${id}`)
+      const response = await fetch(`${API_URL}/events/${id}?_expand=category`)
       if (!response.ok) {
         throw new Error('Erro ao buscar o evento')
       }
@@ -104,7 +106,7 @@ export const useEventStore = defineStore('event', () => {
     }
 
     try {
-      const response = await fetch(`${API_URL}/events?userId=${currentUserId}`)
+      const response = await fetch(`${API_URL}/events?userId=${currentUserId}&_expand=category`)
       if (!response.ok) {
         throw new Error('Erro ao buscar "Meus Eventos"')
       }

@@ -9,7 +9,14 @@ type RegisterData = {
   password: string
 }
 
-type loginData = {
+export interface IUser {
+  id: string
+  name: string
+  email: string
+  role: UserRole
+}
+
+type LoginData = {
   email: string
   password: string
 }
@@ -22,7 +29,42 @@ export const useAuthStore = defineStore('auth', () => {
   
   const API_URL = 'http://localhost:3000'
 
+  const usersList = ref<IUser[]>([])
+
   const isAdmin = computed(() => userRole.value === 'admin')
+
+  async function fetchAllUsers() {
+    try {
+      const response = await fetch(`${API_URL}/users`)
+      usersList.value = await response.json()
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  async function deleteUser(id: string) {
+    try {
+      await fetch(`${API_URL}/users/${id}`, { method: 'DELETE' })
+      await fetchAllUsers() 
+      return true
+    } catch (error) {
+      return false
+    }
+  }
+
+  async function updateUserRole(id: string, newRole: UserRole) {
+    try {
+      await fetch(`${API_URL}/users/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: newRole })
+      })
+      await fetchAllUsers()
+      return true
+    } catch (error) {
+      return false
+    }
+  }
 
   function setAuthState(role: UserRole, id: string | null) {
     isLoggedIn.value = true
@@ -101,9 +143,13 @@ export const useAuthStore = defineStore('auth', () => {
     userRole,
     userId,
     isAdmin,
+    usersList,
     setAuthState,
     logout,
     register,
-    login
+    login,
+    fetchAllUsers,
+    deleteUser,
+    updateUserRole
   }
 })

@@ -17,7 +17,7 @@
           <RouterLink v-if="auth.isAdmin" :to="{ name: 'admin-dashboard' }">
             Admin
           </RouterLink>
-          <a @click="handleLogout" href="#">Logout</a>
+          <a @click="handleLogout" href="#">Logout <font-awesome-icon icon="right-from-bracket" /></a>
         </span>
         <span v-else>
           <RouterLink :to="{ name: 'login' }">Login</RouterLink>

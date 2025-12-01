@@ -5,19 +5,25 @@
 
     <div class="dashboard-grid">
       <RouterLink :to="{ name: 'admin-events' }" class="dashboard-card">
-        <div class="card-icon">📅</div>
+        <div class="card-icon">
+          <font-awesome-icon icon="calendar-days" />
+        </div>
         <h3>Gerenciar Eventos</h3>
         <p>Visualize, edite ou remova qualquer evento da plataforma.</p>
       </RouterLink>
 
       <RouterLink :to="{ name: 'admin-users' }" class="dashboard-card">
-        <div class="card-icon">👥</div>
+        <div class="card-icon">
+          <font-awesome-icon icon="users" />
+        </div>
         <h3>Gerenciar Usuários</h3>
         <p>Veja os usuários cadastrados e gerencie permissões.</p>
       </RouterLink>
 
       <RouterLink :to="{ name: 'admin-categories' }" class="dashboard-card">
-        <div class="card-icon">🏷️</div>
+        <div class="card-icon">
+          <font-awesome-icon icon="tags" />
+        </div>
         <h3>Gerenciar Categorias</h3>
         <p>Crie ou remova categorias para os eventos.</p>
       </RouterLink>

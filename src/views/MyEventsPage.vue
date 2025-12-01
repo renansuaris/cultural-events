@@ -14,8 +14,8 @@
         <div class="event-info">
           <h3>{{ event.title }}</h3>
           <div class="meta-info">
-            <span>📅 {{ event.date }}</span>
-            <span>📍 {{ event.location }}</span>
+            <span><font-awesome-icon icon="calendar-days" /> {{ event.date }}</span>
+            <span><font-awesome-icon icon="map-marker-alt" /> {{ event.location }}</span>
           </div>
         </div>
         
@@ -41,7 +41,7 @@
       <h3>Você ainda não criou nenhum evento.</h3>
       <br>
       <RouterLink :to="{ name: 'create-event' }" class="btn-primary">
-        Criar Evento
+        <font-awesome-icon icon="plus" /> Criar Evento
       </RouterLink>
     </div>
   </main>

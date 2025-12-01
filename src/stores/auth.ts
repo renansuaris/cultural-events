@@ -138,6 +138,26 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function updateProfile(id: string, data: { name: string; email: string; password?: string }) {
+    try {
+      const response = await fetch(`${API_URL}/users/${id}`, {
+        method: 'PATCH', 
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+
+      if (!response.ok) {
+        throw new Error('Erro ao atualizar perfil')
+      }
+      return true
+    } catch (error) {
+      console.error(error)
+      return false
+    }
+  }
+
   return {
     isLoggedIn,
     userRole,
@@ -150,6 +170,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     fetchAllUsers,
     deleteUser,
-    updateUserRole
+    updateUserRole,
+    updateProfile
   }
 })

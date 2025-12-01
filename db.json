@@ -30,7 +30,7 @@
       "id": "1",
       "name": "Admin",
       "email": "admin@email.com",
-      "password": "123",
+      "password": "12345678",
       "role": "admin"
     },
     {
@@ -75,6 +75,15 @@
       "description": "Pagode da Galera com o convidado especial Péricles",
       "categoryId": "1",
       "userId": "1"
+    },
+    {
+      "id": "366f",
+      "title": "Guns and Roses",
+      "date": "10/03/2026",
+      "location": "Arena Castelão",
+      "description": "",
+      "categoryId": "1",
+      "userId": "2"
     }
   ]
 }

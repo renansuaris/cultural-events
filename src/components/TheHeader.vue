@@ -41,7 +41,6 @@ function handleLogout() {
 </script>
 
 <style scoped>
-/* O header principal (continua o mesmo) */
 .main-header {
   width: 100%;
   background-color: #ffffff;
@@ -51,7 +50,6 @@ function handleLogout() {
   box-sizing: border-box;
 }
 
-/* O container (continua o mesmo) */
 .container {
   max-width: 1200px;
   margin: 0 auto;

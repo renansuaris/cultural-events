@@ -1,48 +1,78 @@
-# vue-project
+# :checkered_flag: Cultural Events
 
-This template should help get you started developing with Vue 3 in Vite.
+O projeto **Cultural Events** é um portal centralizado para a divulgação de eventos culturais, como manifestações artísticas, peças de teatro, apresentações musicais, feiras de artesanato, entre outros. A plataforma permite que qualquer visitante visualize os eventos que acontecerão na comunidade. Usuários cadastrados, sejam eles artistas ou membros da comunidade, podem contribuir divulgando seus próprios eventos, fortalecendo a cena cultural local.
 
-## Recommended IDE Setup
+---
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## :technologist: Membros da equipe
 
-## Recommended Browser Setup
+| Matrícula | Nome                    | Curso                  |
+|-----------|-------------------------|------------------------|
+| 555524    | Renan Alencar Soares    | Engenharia de Software |
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd) 
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+---
 
-## Type Support for `.vue` Imports in TS
+## :bulb: Objetivo Geral
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+Fortalecer a cultura local e dar visibilidade a artistas independentes, criando um espaço digital acessível para divulgação e descoberta de eventos culturais na comunidade.
 
-## Customize configuration
+---
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+## :eyes: Público-Alvo
 
-## Project Setup
+- Comunidades locais interessadas em participar de eventos culturais
+- Artistas independentes e organizadores de eventos
+- Produtores culturais que buscam promover manifestações artísticas
 
-```sh
-npm install
-```
+---
 
-### Compile and Hot-Reload for Development
+## :star2: Impacto Esperado
 
-```sh
-npm run dev
-```
+- Aumentar o engajamento da comunidade em eventos locais
+- Gerar maior interação social e fortalecimento de vínculos comunitários
+- Democratizar o acesso à informação sobre eventos culturais
+- Promover a economia criativa e valorizar artistas locais
 
-### Type-Check, Compile and Minify for Production
+---
 
-```sh
-npm run build
-```
+## :people_holding_hands: Papéis ou tipos de usuário da aplicação
 
-### Lint with [ESLint](https://eslint.org/)
+| Papel                    | Descrição                                                                 |
+|--------------------------|---------------------------------------------------------------------------|
+| **Visitante**            | Usuário não autenticado que pode visualizar eventos publicamente          |
+| **Usuário Logado**       | Usuário autenticado que pode criar e gerenciar seus próprios eventos     |
+| **Administrador**        | Usuário com permissões totais de gerenciamento da plataforma             |
 
-```sh
-npm run lint
-```
+---
+
+## :triangular_flag_on_post: Principais funcionalidades da aplicação
+
+### 1. Visitante (Usuário não logado)
+- Visualizar a lista completa de eventos (com paginação)
+- Filtrar eventos por categoria, data ou localização
+- Ver os detalhes completos de um evento específico
+- Realizar cadastro (criar uma nova conta)
+- Realizar login na plataforma
+
+### 2. Usuário Logado
+Todas as permissões do Visitante, além de:
+- **[Restrito]** Criar novos eventos culturais
+- **[Restrito]** Atualizar e deletar apenas os eventos que ele mesmo criou
+- **[Restrito]** Gerenciar sua própria conta de usuário (atualizar dados pessoais, alterar senha)
+- Realizar logout da plataforma
+
+### 3. Administrador
+Todas as permissões do Usuário Logado, além de:
+- **[Restrito]** Gerenciar **TODOS** os eventos, de qualquer usuário (CRUD completo: Criar, Ler, Atualizar, Deletar)
+- **[Restrito]** Gerenciar todas as contas de usuário (visualizar, atualizar papel/permissões, deletar)
+- **[Restrito]** Gerenciar as categorias de eventos (criar, editar e deletar categorias como "Música", "Teatro", "Arte", "Dança", etc.)
+
+---
+
+## :spiral_calendar: Entidades ou tabelas do sistema
+
+| Entidade    | Descrição                                                                 |
+|-------------|---------------------------------------------------------------------------|
+| **User**    | Armazena informações dos usuários (dados pessoais, credenciais, papel)    |
+| **Event**   | Contém dados dos eventos culturais (título, descrição, data, local, etc.) |
+| **Category**| Define as categorias de eventos disponíveis na plataforma                 |

@@ -11,8 +11,8 @@ export class Event {
   @Column()
   title: string;
 
-  @Column()
-  date: string; 
+  @Column( {type: "datetime" })
+  date: Date; 
 
   @Column()
   location: string;
@@ -20,17 +20,15 @@ export class Event {
   @Column()
   description: string;
 
-  @CreateDateColumn()
-  createdAt: Date;
-
   @ManyToOne(() => Category, { onDelete: 'SET NULL' }) 
   @JoinColumn({ name: 'categoryId' })
   category: Category;
 
-  @Column({ nullable: true })
+  @Column({nullable: true})
   categoryId: string;
 
-  @ManyToOne(() => User, (user) => user.events, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.events, {
+     onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 

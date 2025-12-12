@@ -1,31 +1,26 @@
-import { Entity, PrimaryGeneratedColumn, Column} from 'typeorm';
-import { OneToMany } from 'typeorm';
-import { Event } from './Event';
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { OneToMany } from "typeorm";
+import { Event } from "./Event";
 
-export enum UserRole {
-  ADMIN = 'admin',
-  USER = 'user'
-}
+export type UserRole = "user" | "admin";
 
-@Entity('users') 
+@Entity("users")
 export class User {
-  
-  @PrimaryGeneratedColumn('uuid') 
+  @PrimaryGeneratedColumn("uuid")
   id: string;
 
   @Column()
   name: string;
 
-  @Column({ unique: true }) 
+  @Column({ unique: true })
   email: string;
 
   @Column()
   password: string;
 
   @Column({
-    type: 'simple-enum', 
-    enum: UserRole,
-    default: UserRole.USER
+    type: "text",
+    default: "user",
   })
   role: UserRole;
 

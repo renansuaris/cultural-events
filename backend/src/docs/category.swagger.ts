@@ -11,6 +11,8 @@
  *   post:
  *     summary: Cria uma nova categoria
  *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -56,6 +58,8 @@
  *   delete:
  *     summary: Deleta uma categoria pelo ID
  *     tags: [Categories]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

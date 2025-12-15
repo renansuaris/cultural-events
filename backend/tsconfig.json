@@ -10,6 +10,15 @@
     "skipLibCheck": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "strictPropertyInitialization": false 
-  }
+    "strictPropertyInitialization": false,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/@types"   
+    ]
+  },
+  "include": ["src/**/*"],
+  "ts-node": {
+    "files": true,
+    "transpileOnly": true
+  } 
 }

@@ -11,6 +11,8 @@
  *   post:
  *     summary: Cria um novo evento
  *     tags: [Events]
+ *     security:
+ *      - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -56,6 +58,8 @@
  *   put:
  *     summary: Atualiza um evento
  *     tags: [Events]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -87,6 +91,8 @@
  *   delete:
  *     summary: Deleta um evento
  *     tags: [Events]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id

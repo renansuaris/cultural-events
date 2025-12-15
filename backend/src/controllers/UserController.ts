@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
 import { User } from '../entities/User';
+import { hash } from 'bcryptjs';
 
 export class UserController {
   
@@ -18,11 +19,13 @@ export class UserController {
       if (userExists) {
         return res.status(409).json({ message: 'E-mail já cadastrado' });
       }
+
+      const passwordHash = await hash(password, 10);
       
       const newUser = userRepository.create({
         name,
         email,
-        password,
+        password: passwordHash,
       });
 
       await userRepository.save(newUser);

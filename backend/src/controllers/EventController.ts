@@ -6,7 +6,8 @@ export class EventController {
   
   async create(req: Request, res: Response) {
 
-    const { title, date, location, description, categoryId, userId } = req.body;
+    const { title, date, location, description, categoryId } = req.body;
+    const userId = req.userId;
 
     if (!title || !date || !location || !userId || !categoryId) {
       return res.status(400).json({ message: 'Todos os campos obrigatórios devem ser preenchidos' });

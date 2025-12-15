@@ -11,8 +11,8 @@ export class Event {
   @Column()
   title: string;
 
-  @Column( {type: "datetime" })
-  date: Date; 
+  @Column()
+  date: string; 
 
   @Column()
   location: string;

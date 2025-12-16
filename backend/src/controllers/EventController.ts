@@ -9,10 +9,6 @@ export class EventController {
     const { title, date, location, description, categoryId } = req.body;
     const userId = req.userId;
 
-    if (!title || !date || !location || !userId || !categoryId) {
-      return res.status(400).json({ message: 'Todos os campos obrigatórios devem ser preenchidos' });
-    }
-
     try {
       const eventRepository = AppDataSource.getRepository(Event);
 
@@ -35,19 +31,32 @@ export class EventController {
   }
 
   async list(req: Request, res: Response) {
-    try {
-      const eventRepository = AppDataSource.getRepository(Event);
+  try {
+    const eventRepository = AppDataSource.getRepository(Event);
 
-      const events = await eventRepository.find({
-        relations: ['category', 'user']
-      });
+    const events = await eventRepository.find({
+      relations: {
+        category: true, 
+        user: true,   
+      },
+      select: {
+        category: {
+          id: true,
+          name: true,
+        },
+        user: {
+          id: true,
+          name: true,
+        },
+      },
+    });
 
-      return res.json(events);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Erro ao buscar eventos' });
-    }
+    return res.json(events);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Erro ao buscar eventos' });
   }
+}
 
   async update(req: Request, res: Response) {
     const { id } = req.params;

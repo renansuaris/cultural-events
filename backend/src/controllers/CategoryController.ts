@@ -8,10 +8,6 @@ export class CategoryController {
   async create(req: Request, res: Response) {
     const { name } = req.body;
 
-    if (!name) {
-      return res.status(400).json({ message: 'O nome da categoria é obrigatório' });
-    }
-
     try {
       const categoryRepository = AppDataSource.getRepository(Category);
 

@@ -24,7 +24,6 @@
  *               - date
  *               - location
  *               - categoryId
- *               - userId
  *             properties:
  *               title:
  *                 type: string
@@ -35,8 +34,6 @@
  *               description:
  *                 type: string
  *               categoryId:
- *                 type: string
- *               userId:
  *                 type: string
  *     responses:
  *       201:
@@ -81,7 +78,7 @@
  *               description:
  *                 type: string
  *               categoryId:
- *                 type: string
+ *                 type: string # Garanta que está string (UUID) e não integer
  *     responses:
  *       200:
  *         description: Evento atualizado

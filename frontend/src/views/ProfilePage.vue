@@ -43,6 +43,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import api from '@/services/api'
 
 const authStore = useAuthStore()
 
@@ -56,17 +57,14 @@ const error = ref('')
 const successMsg = ref('')
 
 onMounted(async () => {
-  const userId = authStore.userId
-  if (!userId) return
-
   try {
-    const response = await fetch(`http://localhost:3000/users/${userId}`)
-    const user = await response.json()
+    const { data } = await api.get('/users/me')
     
-    name.value = user.name
-    email.value = user.email
+    name.value = data.name
+    email.value = data.email
   } catch (err) {
     error.value = 'Erro ao carregar perfil.'
+    console.error(err)
   } finally {
     isLoading.value = false
   }

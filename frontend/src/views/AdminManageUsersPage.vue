@@ -31,7 +31,7 @@
                 class="btn-icon edit"
                 title="Alterar Papel"
               >
-                🔄 Trocar Papel
+                <font-awesome-icon icon="pen-to-square" /> Trocar Papel
               </button>
 
               <button 
@@ -40,7 +40,7 @@
                 class="btn-icon delete"
                 title="Excluir Usuário"
               >
-                🗑️
+                <font-awesome-icon icon="trash" />
               </button>
               <span v-else class="current-user-tag">(Você)</span>
             </td>
@@ -70,7 +70,6 @@ async function handleDelete(id: string) {
 }
 
 async function toggleRole(user: IUser) {
-  // Se é admin vira user, se é user vira admin
   const newRole = user.role === 'admin' ? 'user' : 'admin'
   
   if (confirm(`Deseja alterar o papel de ${user.name} para "${newRole}"?`)) {
@@ -80,7 +79,6 @@ async function toggleRole(user: IUser) {
 </script>
 
 <style scoped>
-/* Reutilizando o CSS limpo das outras páginas de admin */
 .container {
   max-width: 1200px;
   margin: 2rem auto;
@@ -116,7 +114,6 @@ async function toggleRole(user: IUser) {
   color: #444;
 }
 
-/* Estilos das Badges */
 .role-badge {
   padding: 4px 8px;
   border-radius: 4px;
@@ -125,15 +122,14 @@ async function toggleRole(user: IUser) {
   text-transform: uppercase;
 }
 .role-badge.admin {
-  background-color: #e0e7ff; /* Azul claro */
+  background-color: #e0e7ff; 
   color: #3730a3;
 }
 .role-badge.user {
-  background-color: #ecfccb; /* Verde claro */
+  background-color: #ecfccb; 
   color: #365314;
 }
 
-/* Botões */
 .actions-cell {
   display: flex;
   gap: 0.5rem;

@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
+import api from '@/services/api'
 
 export interface ICategory {
   id: string
@@ -9,16 +10,11 @@ export interface ICategory {
 export const useCategoryStore = defineStore('category', () => {
 
   const categories = ref<ICategory[]>([])
-  
-  const API_URL = 'http://localhost:3000'
 
   async function fetchAllCategories() {
     try {
-      const response = await fetch(`${API_URL}/categories`)
-      if (!response.ok) {
-        throw new Error('Erro ao buscar categorias')
-      }
-      categories.value = await response.json()
+      const { data } = await api.get('/categories')
+      categories.value = data
     } catch (error) {
       console.error(error)
     }
@@ -26,16 +22,7 @@ export const useCategoryStore = defineStore('category', () => {
 
   async function createCategory(name: string) {
     try {
-      const response = await fetch(`${API_URL}/categories`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ name }) 
-      })
-      if (!response.ok) {
-        throw new Error('Erro ao criar categoria')
-      }
+      await api.post('/categories', { name })
       await fetchAllCategories()
       return true
     } catch (error) {
@@ -46,13 +33,7 @@ export const useCategoryStore = defineStore('category', () => {
   
   async function deleteCategory(id: string) {
     try {
-      const response = await fetch(`${API_URL}/categories/${id}`, {
-        method: 'DELETE'
-      })
-      if (!response.ok) {
-        throw new Error('Erro ao deletar categoria')
-      }
-  
+      await api.delete(`/categories/${id}`)
       await fetchAllCategories()
       return true
     } catch (error) {

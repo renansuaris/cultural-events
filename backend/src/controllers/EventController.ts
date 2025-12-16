@@ -106,4 +106,27 @@ export class EventController {
       return res.status(500).json({ message: 'Erro ao deletar evento' });
     }
   }
+
+  async show(req: Request, res: Response) {
+    const { id } = req.params;
+
+    try {
+      const eventRepository = AppDataSource.getRepository(Event);
+      
+      const event = await eventRepository.findOne({
+        where: { id }, 
+        relations: ['category', 'user'] 
+      });
+
+      if (!event) {
+        return res.status(404).json({ message: 'Evento não encontrado' });
+      }
+
+      return res.json(event);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Erro ao buscar evento' });
+    }
+  }
+
 }

@@ -75,26 +75,25 @@ export class UserController {
     const { id } = req.params;
     const loggedUserId = req.userId;
 
-    if (id !== loggedUserId) {
-        return res.status(403).json({ message: "Você não tem permissão para deletar este usuário" });
-    }
-
     try {
       const userRepository = AppDataSource.getRepository(User);
-      const user = await userRepository.findOneBy({ id }); 
-
-      if (!user) {
-        return res.status(404).json({ message: 'Usuário não encontrado' });
+      
+      const requester = await userRepository.findOneBy({ id: loggedUserId });
+      
+      if (id !== loggedUserId && requester?.role !== 'admin') {
+          return res.status(403).json({ message: "Sem permissão" });
       }
+
+      const user = await userRepository.findOneBy({ id }); 
+      if (!user) return res.status(404).json({ message: 'Usuário não encontrado' });
 
       await userRepository.remove(user);
       return res.status(204).send();
 
     } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Erro ao deletar usuário' });
+      return res.status(500).json({ message: 'Erro ao deletar' });
     }
-  }
+}
 
   async me(req: Request, res: Response) {
     const userId = req.userId; 
@@ -114,6 +113,45 @@ export class UserController {
     } catch (error) {
       console.error(error);
       return res.status(500).json({ message: 'Erro ao buscar dados do perfil' });
+    }
+  }
+
+  async index(req: Request, res: Response) {
+    try {
+      const userRepository = AppDataSource.getRepository(User);
+      
+      const users = await userRepository.find();
+
+      const usersReturn = users.map(user => {
+        const { password: _, ...userData } = user;
+        return userData;
+      });
+
+      return res.json(usersReturn);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Erro ao buscar usuários' });
+    }
+  }
+
+  async updateRole(req: Request, res: Response) {
+    const { id } = req.params;
+    const { role } = req.body;
+
+    try {
+      const userRepository = AppDataSource.getRepository(User);
+      const user = await userRepository.findOneBy({ id }); 
+
+      if (!user) {
+        return res.status(404).json({ message: 'Usuário não encontrado' });
+      }
+
+      user.role = role;
+      await userRepository.save(user);
+
+      return res.json({ message: 'Papel atualizado com sucesso' });
+    } catch (error) {
+      return res.status(500).json({ message: 'Erro ao atualizar papel' });
     }
   }
 

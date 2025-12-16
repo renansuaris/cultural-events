@@ -2,6 +2,7 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useAuthStore } from './auth'
 import { type ICategory } from './category.store'
+import api from '@/services/api'
 
 export interface IEvent {
   id: string
@@ -27,6 +28,7 @@ type UpdateEventData = {
   date: string
   location: string
   description: string
+  categoryId?: string
 }
 
 export const useEventStore = defineStore('event', () => {
@@ -34,15 +36,11 @@ export const useEventStore = defineStore('event', () => {
   const events = ref<IEvent[]>([])
   const currentEvent = ref<IEvent | null>(null)
   const myEvents = ref<IEvent[]>([])
-  const API_URL = 'http://localhost:3000'
 
   async function fetchAllEvents() {
     try {
-      const response = await fetch(`${API_URL}/events?_expand=category`)
-      if (!response.ok) {
-        throw new Error('Erro ao buscar eventos')
-      }
-      events.value = await response.json()
+      const { data } = await api.get('/events')
+      events.value = data
     } catch (error) {
       console.error(error)
     }
@@ -51,43 +49,16 @@ export const useEventStore = defineStore('event', () => {
   async function fetchEventById(id: string) {
     currentEvent.value = null 
     try {
-      const response = await fetch(`${API_URL}/events/${id}?_expand=category`)
-      if (!response.ok) {
-        throw new Error('Erro ao buscar o evento')
-      }
-      currentEvent.value = await response.json()
+      const { data } = await api.get(`/events/${id}`)
+      currentEvent.value = data
     } catch (error) {
       console.error(error)
     }
   }
 
   async function createEvent(eventData: CreateEventData) {
-    const authStore = useAuthStore()
-    const currentUserId = authStore.userId
-
-    if (!currentUserId) {
-      console.error('Usuário não logado, impossível criar evento.')
-      return false 
-    }
-
-    const fullEventData = {
-      ...eventData,
-      userId: currentUserId
-    }
-
     try {
-      const response = await fetch(`${API_URL}/events`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(fullEventData)
-      })
-
-      if (!response.ok) {
-        throw new Error('Erro ao criar evento')
-      }
-
+      await api.post('/events', eventData)
       await fetchAllEvents()
       return true
     } catch (error) {
@@ -100,48 +71,22 @@ export const useEventStore = defineStore('event', () => {
     const authStore = useAuthStore()
     const currentUserId = authStore.userId
 
-    if (!currentUserId) {
-      console.warn('Nenhum usuário logado para buscar "Meus Eventos".')
-      return 
-    }
+    if (!currentUserId) return 
 
     try {
-      const response = await fetch(`${API_URL}/events?userId=${currentUserId}&_expand=category`)
-      if (!response.ok) {
-        throw new Error('Erro ao buscar "Meus Eventos"')
-      }
-      myEvents.value = await response.json()
+      const { data } = await api.get('/events')
+      
+      myEvents.value = data.filter((event: IEvent) => event.userId === currentUserId)
+      
     } catch (error) {
       console.error(error)
     }
   }
 
   async function updateEvent(id: string, eventData: UpdateEventData) {
-
-    if (!currentEvent.value) {
-      console.error('Nenhum evento carregado para atualizar.')
-      return false
-    }
-    const fullEventData = {
-      ...currentEvent.value, 
-      ...eventData             
-    }
-
     try {
-      const response = await fetch(`${API_URL}/events/${id}`, {
-        method: 'PUT', 
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(fullEventData) 
-      })
-
-      if (!response.ok) {
-        throw new Error('Erro ao atualizar evento')
-      }
-
+      await api.put(`/events/${id}`, eventData)
       await fetchMyEvents() 
-      
       return true 
     } catch (error) {
       console.error(error)
@@ -151,16 +96,8 @@ export const useEventStore = defineStore('event', () => {
 
   async function deleteEvent(id: string) {
     try {
-      const response = await fetch(`${API_URL}/events/${id}`, {
-        method: 'DELETE' 
-      })
-
-      if (!response.ok) {
-        throw new Error('Erro ao deletar evento')
-      }
-
+      await api.delete(`/events/${id}`)
       await fetchMyEvents() 
-      
       return true 
     } catch (error) {
       console.error(error)

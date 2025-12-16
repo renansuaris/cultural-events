@@ -103,10 +103,15 @@ export const useAuthStore = defineStore('auth', () => {
     localStorage.removeItem('user')
   }
 
-  // FAZER A DE ATUALIZAR ROLE NO BACK
   async function updateUserRole(id: string, newRole: UserRole) {
-     console.warn("Funcionalidade pendente de backend")
-     return false
+    try {
+      await api.patch(`/users/${id}/role`, { role: newRole })
+      await fetchAllUsers()
+      return true
+    } catch (error) {
+      console.error('Erro ao atualizar papel:', error)
+      return false
+    }
   }
 
   async function updateProfile(id: string, updateData: any) {

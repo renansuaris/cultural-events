@@ -16,3 +16,14 @@ export const updateUserSchema = z.object({
     id: z.string(),
   }),
 });
+
+export const updateRoleSchema = z.object({
+  body: z.object({
+    role: z.enum(['admin', 'user'], {
+      errorMap: () => ({ message: "O papel deve ser 'admin' ou 'user'" })
+    }),
+  }),
+  params: z.object({
+    id: z.string(),
+  }),
+});

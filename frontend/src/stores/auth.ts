@@ -1,5 +1,6 @@
 import { ref, computed } from 'vue' 
 import { defineStore } from 'pinia'
+import api from '@/services/api'
 
 type UserRole = 'admin' | 'user' | null
 
@@ -26,17 +27,57 @@ export const useAuthStore = defineStore('auth', () => {
   const isLoggedIn = ref(false)
   const userRole = ref<UserRole>(null) 
   const userId = ref<string | null>(null)
-  
-  const API_URL = 'http://localhost:3000'
+  const userName = ref<string>('')
 
   const usersList = ref<IUser[]>([])
 
   const isAdmin = computed(() => userRole.value === 'admin')
 
+  async function login(loginData: LoginData) {
+    try {
+      const { data } = await api.post('/login', loginData)
+      const { user, token } = data
+      setAuthState(user.role, user.id, user.name)
+      
+      localStorage.setItem('token', token)
+      localStorage.setItem('user', JSON.stringify(user)) 
+
+      return { success: true, role: user.role }
+    } catch (error: any) {
+      console.error(error)
+      const msg = error.response?.data?.message || 'Erro de conexão'
+      return { success: false, error: msg }
+    }
+  }
+
+  async function register(registerData: RegisterData) {
+    try {
+      const { data } = await api.post('/users', registerData)
+
+      return { success: true }
+
+    } catch (error: any) {
+      const msg = error.response?.data?.message || 'Erro ao cadastrar'
+      return { success: false, error: msg }
+    }
+  }
+
+  function checkToken() {
+    const token = localStorage.getItem('token')
+    const userStored = localStorage.getItem('user')
+
+    if (token && userStored) {
+      const user = JSON.parse(userStored)
+      setAuthState(user.role, user.id, user.name)
+    } else {
+      logout()
+    }
+  }
+
   async function fetchAllUsers() {
     try {
-      const response = await fetch(`${API_URL}/users`)
-      usersList.value = await response.json()
+      const { data } = await api.get('/users') 
+      usersList.value = data
     } catch (error) {
       console.error(error)
     }
@@ -44,7 +85,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   async function deleteUser(id: string) {
     try {
-      await fetch(`${API_URL}/users/${id}`, { method: 'DELETE' })
+      await api.delete(`/users/${id}`)
       await fetchAllUsers() 
       return true
     } catch (error) {
@@ -52,122 +93,58 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function updateUserRole(id: string, newRole: UserRole) {
-    try {
-      await fetch(`${API_URL}/users/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: newRole })
-      })
-      await fetchAllUsers()
-      return true
-    } catch (error) {
-      return false
-    }
-  }
-
-  function setAuthState(role: UserRole, id: string | null) {
-    isLoggedIn.value = true
-    userRole.value = role
-    userId.value = id
-  }
-
   function logout() {
     isLoggedIn.value = false
     userRole.value = null
-    userId.value = null 
+    userId.value = null
+    userName.value = ''
+    
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
   }
 
-  async function register(registerData: RegisterData) {
-    const { name, email, password } = registerData
-    try {
-      const emailCheck = await fetch(`${API_URL}/users?email=${email}`)
-      const existingUsers = await emailCheck.json()
-
-      if (existingUsers.length > 0) {
-        return { success: false, error: 'Este email já está cadastrado.' }
-      }
-
-      const newUser = {
-        name,
-        email,
-        password,
-        role: 'user' 
-      }
-
-      const response = await fetch(`${API_URL}/users`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newUser)
-      })
-
-      if (!response.ok) {
-        throw new Error('Erro ao registrar no servidor')
-      }
-
-      const createdUser = await response.json()
-
-      setAuthState(createdUser.role, createdUser.id)
-
-      return { success: true }
-    } catch (error) {
-      console.error(error)
-      return { success: false, error: 'Ocorreu um erro de conexão.' }
-    }
+  // FAZER A DE ATUALIZAR ROLE NO BACK
+  async function updateUserRole(id: string, newRole: UserRole) {
+     console.warn("Funcionalidade pendente de backend")
+     return false
   }
 
-  async function login(loginData: LoginData) {
-    const { email, password } = loginData
-    try {
-      const response = await fetch(
-        `${API_URL}/users?email=${email}&password=${password}`
-      )
-      const users = await response.json()
-
-      if (users.length === 0) {
-        return { success: false, error: 'Email ou senha inválidos.' }
+  async function updateProfile(id: string, updateData: any) {
+      try {
+          await api.put(`/users/${id}`, updateData)
+          
+          if (userId.value === id) {
+              userName.value = updateData.name
+              const userStored = JSON.parse(localStorage.getItem('user') || '{}')
+              userStored.name = updateData.name
+              userStored.email = updateData.email
+              localStorage.setItem('user', JSON.stringify(userStored))
+          }
+          
+          return true
+      } catch (error) {
+          return false
       }
-
-      const user = users[0] 
-      setAuthState(user.role, user.id) 
-
-      return { success: true, role: user.role as UserRole, id: user.id }
-    } catch (error) {
-      console.error(error)
-      return { success: false, error: 'Ocorreu um erro de conexão.' }
-    }
   }
 
-  async function updateProfile(id: string, data: { name: string; email: string; password?: string }) {
-    try {
-      const response = await fetch(`${API_URL}/users/${id}`, {
-        method: 'PATCH', 
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-
-      if (!response.ok) {
-        throw new Error('Erro ao atualizar perfil')
-      }
-      return true
-    } catch (error) {
-      console.error(error)
-      return false
-    }
+  function setAuthState(role: UserRole, id: string, name: string) {
+    isLoggedIn.value = true
+    userRole.value = role
+    userId.value = id
+    userName.value = name
   }
 
   return {
     isLoggedIn,
     userRole,
     userId,
+    userName,
     isAdmin,
     usersList,
-    setAuthState,
-    logout,
-    register,
     login,
+    register,
+    logout,
+    checkToken,
     fetchAllUsers,
     deleteUser,
     updateUserRole,

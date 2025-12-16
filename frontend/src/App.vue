@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import TheHeader from './components/TheHeader.vue'
 import { RouterView } from 'vue-router'
+import { useAuthStore } from './stores/auth'
+import { onMounted } from 'vue'
+
+const authStore = useAuthStore()
+
+onMounted(() => {
+  authStore.checkToken()
+})
 </script>
 
 <template>

@@ -1,11 +1,29 @@
 <template>
   <div class="event-card">
-    <p class="card-category">{{ categoryName }}</p>
+    <div class="card-header">
+      <span class="category-badge">{{ categoryName }}</span>
+    </div>
 
-   <h3>{{ title }}</h3>
-   <p><strong>Data:</strong> {{ date }}</p>
-    <p><strong>Local:</strong> {{ location }}</p>
-    <RouterLink class="details-link" :to="{ name: 'event-details', params: { id: id } }"> Ver Detalhes </RouterLink>
+    <div class="card-content">
+      <h3 class="card-title" :title="title">{{ title }}</h3>
+      
+      <div class="card-info">
+        <p>
+          <font-awesome-icon icon="calendar-days" class="icon" /> 
+          {{ date }}
+        </p>
+        <p>
+          <font-awesome-icon icon="map-marker-alt" class="icon" /> 
+          {{ location }}
+        </p>
+      </div>
+
+      <div class="card-footer">
+        <RouterLink class="btn-details" :to="{ name: 'event-details', params: { id: id } }">
+          Ver Detalhes
+        </RouterLink>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -23,59 +41,96 @@ defineProps<{
 
 <style scoped>
 .event-card {
- 
   background-color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08); 
-  
-  padding: 1.5rem;
-  margin-bottom: 0; 
-  position: relative;
-  
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #e0e0e0; 
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.2s, box-shadow 0.2s;
+  height: 100%; 
 }
 
 .event-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
+  border-color: #007bff;
 }
 
-.event-card h3 {
-  font-size: 1.25rem;
-  font-weight: 700; 
-  color: #333;
-  margin-top: 0.5rem;
-  margin-bottom: 1rem;
+.card-header {
+  padding: 1.5rem 1.5rem 0.5rem 1.5rem;
 }
 
-.event-card p {
-  color: #555;
+.category-badge {
+  background-color: #e3f2fd; 
+  color: #007bff; 
+  padding: 0.35rem 0.75rem;
+  border-radius: 50px; 
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+}
+
+.card-content {
+  padding: 0 1.5rem 1.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; 
+}
+
+.card-title {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin: 0.5rem 0 1rem 0;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.card-info {
+  margin-bottom: 1.5rem;
+}
+
+.card-info p {
+  color: #666;
+  font-size: 0.95rem;
   margin-bottom: 0.5rem;
-  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
-.card-category {
-  position: absolute;
-  top: 1.5rem; 
-  right: 1.5rem; 
+.icon {
+  color: #999;
+  width: 16px;
+}
+
+.card-footer {
+  margin-top: auto; 
+  padding-right: 1.5rem;
+}
+
+.btn-details {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background-color: #f8f9fa;
+  color: #333;
+  font-weight: 600;
+  padding: 0.75rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.btn-details:hover {
   background-color: #007bff;
   color: white;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: bold;
-}
-
-.details-link {
-  text-decoration: none;
-  color: #007bff;
-  font-weight: 700;
-  font-size: 0.9rem;
-  margin-top: 1rem;
-  display: inline-block; 
-}
-
-.details-link:hover {
-  text-decoration: underline;
 }
 </style>

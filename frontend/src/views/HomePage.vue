@@ -1,15 +1,20 @@
 <template>
   <main>
     <h1>Próximos Eventos Culturais</h1>
-    <div class="event-list">
+    
+    <div v-if="eventStore.events.length === 0" class="loading">
+      <p>Sem Eventos</p>
+    </div>
+
+    <div v-else class="event-list">
       <EventCard
-        v-for="event in joinedEvents"
+        v-for="event in eventStore.events"
         :key="event.id"
         :id="event.id" 
         :title="event.title"
         :date="event.date"
         :location="event.location"
-                :categoryName="event.categoryName"
+        :categoryName="event.category?.name || 'Sem Categoria'"
       />
     </div>
   </main>
@@ -17,39 +22,13 @@
 
 <script setup lang="ts">
 import EventCard from '@/components/EventCard.vue'
-import { useCategoryStore } from '@/stores/category.store'
-import { onMounted, computed } from 'vue'
+import { onMounted } from 'vue'
 import { useEventStore } from '@/stores/event.store'
 
 const eventStore = useEventStore()
-const categoryStore = useCategoryStore()
 
 onMounted(() => {
-
   eventStore.fetchAllEvents()
-  categoryStore.fetchAllCategories()
-})
-
-const joinedEvents = computed(() => {
-
-  const events = eventStore.events
-
-  const categories = categoryStore.categories
-  if (categories.length === 0) {
-    return events.map(event => ({
-      ...event,
-      categoryName: 'Carregando...'
-    }))
-  }
-
-  return events.map(event => {
-    const category = categories.find(c => c.id === event.categoryId)
-    
-    return {
-      ...event, 
-      categoryName: category?.name || 'Sem Categoria'
-    }
-  })
 })
 </script>
 
@@ -64,5 +43,10 @@ main {
   max-width: 1200px;
   margin: 0 auto;
   padding: 1rem;
+}
+.loading {
+  text-align: center;
+  font-size: 2rem;
+  color: #666;
 }
 </style>

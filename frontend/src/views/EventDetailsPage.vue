@@ -3,7 +3,7 @@
     <div v-if="eventStore.currentEvent" class="event-content">
       <h1>{{ eventStore.currentEvent.title }}</h1>
       <div class="event-info">
-        <p><strong>Data:</strong> {{ eventStore.currentEvent.date }}</p>
+        <p><strong>Data:</strong> {{ formatDate(eventStore.currentEvent.date) }}</p>
       <p><strong>Local:</strong> {{ eventStore.currentEvent.location }}</p>
       </div>
       <hr />
@@ -21,7 +21,7 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
-
+import { formatDate } from '@/utils/formatDate'
 import { useEventStore } from '@/stores/event.store'
 
 const eventStore = useEventStore()

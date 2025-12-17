@@ -31,7 +31,7 @@
         <div class="form-row">
           <div class="form-group half-width">
             <label for="date">Data e Hora:</label>
-            <input type="text" id="date" v-model="date" />
+            <input type="datetime-local" id="date" v-model="date" />
           </div>
           <div class="form-group half-width">
             <label for="location">Local:</label>

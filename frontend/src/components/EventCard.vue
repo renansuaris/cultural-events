@@ -10,7 +10,7 @@
       <div class="card-info">
         <p>
           <font-awesome-icon icon="calendar-days" class="icon" /> 
-          {{ date }}
+          {{ formatDate(date) }}
         </p>
         <p>
           <font-awesome-icon icon="map-marker-alt" class="icon" /> 
@@ -29,6 +29,7 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import { formatDate } from '@/utils/formatDate'
 
 defineProps<{
   id: string

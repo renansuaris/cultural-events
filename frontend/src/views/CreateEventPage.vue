@@ -28,7 +28,7 @@
 
         <div class="form-group">
           <label for="date">Data e Hora:</label>
-          <input type="text" id="date" v-model="date" placeholder="ex: 10/12/2025 às 19:00" />
+          <input type="datetime-local" id="date" v-model="date" class="form-control" />
           <p v-if="errors.date" class="error">{{ errors.date }}</p>
         </div>
 

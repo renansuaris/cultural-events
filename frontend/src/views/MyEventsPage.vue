@@ -14,7 +14,7 @@
         <div class="event-info">
           <h3>{{ event.title }}</h3>
           <div class="meta-info">
-            <span><font-awesome-icon icon="calendar-days" /> {{ event.date }}</span>
+            <span><font-awesome-icon icon="calendar-days" /> {{ formatDate(event.date) }}</span>
             <span><font-awesome-icon icon="map-marker-alt" /> {{ event.location }}</span>
           </div>
         </div>
@@ -51,6 +51,7 @@
 import { onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useEventStore } from '@/stores/event.store'
+import { formatDate } from '@/utils/formatDate'
 
 const eventStore = useEventStore()
 

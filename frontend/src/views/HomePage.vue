@@ -1,52 +1,54 @@
 <template>
-  <main>
-    <h1>Próximos Eventos Culturais</h1>
+  <main class="home-container">
+    <div class="header-section">
+      <h1>Próximos Eventos Culturais</h1>
+      <p class="subtitle">Vem ver o que está acontecendo na sua cidade!</p>
+    </div>
     
-    <div v-if="eventStore.events.length === 0" class="loading">
-      <p>Sem Eventos</p>
-    </div>
-
-    <div v-else class="event-list">
-      <EventCard
-        v-for="event in eventStore.events"
-        :key="event.id"
-        :id="event.id" 
-        :title="event.title"
-        :date="event.date"
-        :location="event.location"
-        :categoryName="event.category?.name || 'Sem Categoria'"
-      />
-    </div>
+    <EventGrid 
+      :events="eventStore.events" 
+      :isLoading="isLoading" O usuário já consegue criar eventos, mas... onde ele vê os eventos que criou?
+    />
   </main>
 </template>
 
 <script setup lang="ts">
-import EventCard from '@/components/EventCard.vue'
-import { onMounted } from 'vue'
+
+import { onMounted, ref } from 'vue'
 import { useEventStore } from '@/stores/event.store'
+import EventGrid from '@/components/EventGrid.vue'
 
 const eventStore = useEventStore()
+const isLoading = ref(true)
 
-onMounted(() => {
-  eventStore.fetchAllEvents()
+onMounted(async () => {
+  await eventStore.fetchAllEvents()
+  isLoading.value = false
 })
 </script>
 
 <style scoped>
 
-.event-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 1.5rem;
-}
-main {
+.home-container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 2rem 1rem;
 }
-.loading {
+
+.header-section {
   text-align: center;
-  font-size: 2rem;
-  color: #666;
+  margin-bottom: 3rem;
 }
+
+h1 {
+  color: #2c3e50;
+  margin-bottom: 0.5rem;
+  font-size: 2rem;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 1.1rem;
+}
+
 </style>

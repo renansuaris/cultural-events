@@ -37,9 +37,12 @@ export const useEventStore = defineStore('event', () => {
   const currentEvent = ref<IEvent | null>(null)
   const myEvents = ref<IEvent[]>([])
 
-  async function fetchAllEvents() {
+  async function fetchAllEvents(filterCategoryId?: string) {
     try {
-      const { data } = await api.get('/events')
+      const url = filterCategoryId 
+        ? `/events?categoryId=${filterCategoryId}` 
+        : '/events'
+      const { data } = await api.get(url)
       events.value = data
     } catch (error) {
       console.error(error)

@@ -31,25 +31,34 @@ export class EventController {
   }
 
   async list(req: Request, res: Response) {
-  try {
-    const eventRepository = AppDataSource.getRepository(Event);
+    try {
+      const eventRepository = AppDataSource.getRepository(Event);
 
-    const events = await eventRepository.find({
-      relations: {
+      const { categoryId } = req.query; 
+
+      const whereCondition: any = {};
+    
+      if (categoryId) {
+        whereCondition.categoryId = categoryId;
+      }
+
+      const events = await eventRepository.find({
+        where: whereCondition, 
+        relations: {
         category: true, 
         user: true,   
-      },
-      select: {
-        category: {
-          id: true,
-          name: true,
         },
-        user: {
-          id: true,
-          name: true,
+        select: {
+          category: {
+            id: true,
+            name: true,
+          },
+          user: {
+            id: true,
+            name: true,
+          },
         },
-      },
-    });
+      });
 
     return res.json(events);
   } catch (error) {

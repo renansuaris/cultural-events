@@ -2,7 +2,7 @@
   <header class="main-header">
     <div class="container">
       <RouterLink :to="{ name: 'home' }" class="logo">
-        Cultural Events
+        Cultural <span class="color">Events</span>
       </RouterLink>
 
       <nav class="main-nav">
@@ -75,6 +75,10 @@ function handleLogout() {
   display: flex;
   align-items: center;
   gap: 1.5rem; 
+}
+
+.color {
+  color: #007bff;
 }
 
 .main-nav a {

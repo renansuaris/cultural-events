@@ -31,36 +31,44 @@ export class EventController {
   }
 
   async list(req: Request, res: Response) {
-    try {
-      const eventRepository = AppDataSource.getRepository(Event);
+  try {
+    const eventRepository = AppDataSource.getRepository(Event);
 
-      const { categoryId } = req.query; 
+    const { categoryId, userId } = req.query; 
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 6;
 
-      const whereCondition: any = {};
+    const skip = (page - 1) * limit;
+
+    const whereCondition: any = {};
     
-      if (categoryId) {
-        whereCondition.categoryId = categoryId;
-      }
+    if (categoryId) {
+      whereCondition.categoryId = categoryId;
+    }
+    
+    if (userId) {
+      whereCondition.userId = userId;
+    }
 
-      const events = await eventRepository.find({
-        where: whereCondition, 
-        relations: {
-        category: true, 
-        user: true,   
-        },
-        select: {
-          category: {
-            id: true,
-            name: true,
-          },
-          user: {
-            id: true,
-            name: true,
-          },
-        },
-      });
+    const [events, total] = await eventRepository.findAndCount({
+      where: whereCondition,
+      relations: { category: true, user: true },
+      select: {
+        category: { id: true, name: true },
+        user: { id: true, name: true },
+      },
+      order: { date: 'ASC' },
+      take: limit,
+      skip: skip,
+    });
 
-    return res.json(events);
+    return res.json({
+      data: events,
+      total,
+      page,
+      lastPage: Math.ceil(total / limit)
+    });
+
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Erro ao buscar eventos' });

@@ -37,13 +37,25 @@ export const useEventStore = defineStore('event', () => {
   const currentEvent = ref<IEvent | null>(null)
   const myEvents = ref<IEvent[]>([])
 
-  async function fetchAllEvents(filterCategoryId?: string) {
+  const page = ref(1)
+  const totalPages = ref(1)
+
+  async function fetchAllEvents(categoryId?: string, pageNumber = 1) {
     try {
-      const url = filterCategoryId 
-        ? `/events?categoryId=${filterCategoryId}` 
-        : '/events'
-      const { data } = await api.get(url)
-      events.value = data
+      const params = new URLSearchParams()
+      params.append('page', pageNumber.toString())
+      params.append('limit', '6') 
+      
+      if (categoryId) {
+        params.append('categoryId', categoryId)
+      }
+
+      const { data } = await api.get(`/events?${params.toString()}`)
+      
+      events.value = data.data
+      page.value = data.page
+      totalPages.value = data.lastPage
+
     } catch (error) {
       console.error(error)
     }
@@ -77,9 +89,8 @@ export const useEventStore = defineStore('event', () => {
     if (!currentUserId) return 
 
     try {
-      const { data } = await api.get('/events')
-      
-      myEvents.value = data.filter((event: IEvent) => event.userId === currentUserId)
+      const { data } = await api.get(`/events?userId=${currentUserId}&limit=100`)
+      myEvents.value = data.data
       
     } catch (error) {
       console.error(error)
@@ -110,6 +121,8 @@ export const useEventStore = defineStore('event', () => {
 
   return { 
     events, 
+    page, 
+    totalPages,
     currentEvent,
     myEvents, 
     fetchAllEvents, 

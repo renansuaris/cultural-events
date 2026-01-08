@@ -24,6 +24,28 @@
     </div>
 
     <EventGrid :events="eventStore.events" :isLoading="isLoading" />
+
+    <div v-if="eventStore.totalPages > 1" class="pagination-controls">
+      <button 
+        :disabled="eventStore.page === 1" 
+        @click="changePage(eventStore.page - 1)"
+        class="btn-page"
+      >
+        &laquo; Anterior
+      </button>
+
+      <span class="page-info">
+        Página {{ eventStore.page }} de {{ eventStore.totalPages }}
+      </span>
+
+      <button 
+        :disabled="eventStore.page === eventStore.totalPages" 
+        @click="changePage(eventStore.page + 1)"
+        class="btn-page"
+      >
+        Próximo &raquo;
+      </button>
+    </div>
   </main>
 </template>
 
@@ -49,7 +71,14 @@ onMounted(async () => {
 
 async function handleFilterChange() {
   isLoading.value = true
-  await eventStore.fetchAllEvents(selectedCategory.value)
+  await eventStore.fetchAllEvents(selectedCategory.value, 1)
+  isLoading.value = false
+}
+
+async function changePage(newPage: number) {
+  isLoading.value = true
+  await eventStore.fetchAllEvents(selectedCategory.value, newPage)
+  window.scrollTo({ top: 0 })
   isLoading.value = false
 }
 </script>
@@ -95,5 +124,42 @@ h1 {
   border-radius: 6px;
   background-color: white;
   min-width: 180px;
+}
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eee;
+}
+
+.btn-page {
+  background-color: white;
+  border: 1px solid #ddd;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  color: #555;
+  transition: 0.2s;
+}
+
+.btn-page:hover:not(:disabled) {
+  border-color: #007bff;
+  color: #007bff;
+  background-color: #f0f7ff;
+}
+
+.btn-page:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f9f9f9;
+}
+
+.page-info {
+  font-weight: bold;
+  color: #444;
 }
 </style>

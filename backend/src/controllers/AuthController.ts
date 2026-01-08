@@ -3,6 +3,7 @@ import { AppDataSource } from '../data-source';
 import { User } from '../entities/User';
 import { compare } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
+import { AppError } from '../errors/AppErrors';
 
 export class AuthController {
   
@@ -14,13 +15,13 @@ export class AuthController {
     const user = await userRepository.findOneBy({ email });
 
     if (!user) {
-      return res.status(401).json({ message: 'Email ou senha incorretos' });
+      throw new AppError('Email ou senha incorretos', 401);
     }
 
     const isValidPassword = await compare(password, user.password);
 
     if (!isValidPassword) {
-      return res.status(401).json({ message: 'Email ou senha incorretos' });
+      throw new AppError('Email ou senha incorretos', 401);
     }
 
     const token = sign({ id: user.id }, process.env.JWT_SECRET ?? '', { expiresIn: '1d' });

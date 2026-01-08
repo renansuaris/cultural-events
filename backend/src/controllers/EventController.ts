@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
 import { Event } from '../entities/Event';
 import { User } from '../entities/User';
+import { AppError } from '../errors/AppErrors';
+
 
 export class EventController {
   
@@ -10,29 +12,24 @@ export class EventController {
     const { title, date, location, description, categoryId } = req.body;
     const userId = req.userId;
 
-    try {
-      const eventRepository = AppDataSource.getRepository(Event);
+    const eventRepository = AppDataSource.getRepository(Event);
 
-      const newEvent = eventRepository.create({
-        title,
-        date, 
-        location,
-        description,
-        categoryId, 
-        userId      
-      });
+    const newEvent = eventRepository.create({
+      title,
+      date, 
+      location,
+      description,
+      categoryId, 
+      userId      
+    });
 
-      await eventRepository.save(newEvent);
+    await eventRepository.save(newEvent);
 
-      return res.status(201).json(newEvent);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Erro ao criar evento' });
-    }
+    return res.status(201).json(newEvent);
   }
 
   async list(req: Request, res: Response) {
-  try {
+
     const eventRepository = AppDataSource.getRepository(Event);
 
     const { categoryId, userId } = req.query; 
@@ -42,7 +39,7 @@ export class EventController {
     const skip = (page - 1) * limit;
 
     const whereCondition: any = {};
-    
+      
     if (categoryId) {
       whereCondition.categoryId = categoryId;
     }
@@ -61,7 +58,7 @@ export class EventController {
       order: { date: 'ASC' },
       take: limit,
       skip: skip,
-    });
+  });
 
     return res.json({
       data: events,
@@ -69,99 +66,78 @@ export class EventController {
       page,
       lastPage: Math.ceil(total / limit)
     });
-
-  } catch (error) {
-    console.error(error);
-    return res.status(500).json({ message: 'Erro ao buscar eventos' });
-  }
 }
 
   async update(req: Request, res: Response) {
+
     const { id } = req.params;
     const { title, date, location, description, categoryId } = req.body;
     const userId = req.userId;
 
-    try {
+    const eventRepository = AppDataSource.getRepository(Event);
+    const userRepository = AppDataSource.getRepository(User); 
 
-      const eventRepository = AppDataSource.getRepository(Event);
-      const userRepository = AppDataSource.getRepository(User); 
+    const event = await eventRepository.findOneBy({ id });
 
-      const event = await eventRepository.findOneBy({ id });
-
-      if (!event) {
-        return res.status(404).json({ message: 'Evento não encontrado' });
-      }
-
-      const requestUser = await userRepository.findOneBy({ id: userId });
-      
-      if (event.userId !== userId && requestUser?.role !== 'admin') {
-        return res.status(403).json({ message: 'Voce não tem permissão pra editar esse evento!' });
-      }
-
-      event.title = title || event.title;
-      event.date = date || event.date;
-      event.location = location || event.location;
-      event.description = description || event.description;
-      event.categoryId = categoryId || event.categoryId;
-
-      await eventRepository.save(event);
-
-      return res.json(event);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Erro ao atualizar evento' });
+    if (!event) {
+      throw new AppError('Evento não encontrado', 404);
     }
+
+    const requestUser = await userRepository.findOneBy({ id: userId });
+      
+    if (event.userId !== userId && requestUser?.role !== 'admin') {
+      throw new AppError('Voce não tem permissão para alterar este evento', 403);
+    }
+
+    event.title = title || event.title;
+    event.date = date || event.date;
+    event.location = location || event.location;
+    event.description = description || event.description;
+    event.categoryId = categoryId || event.categoryId;
+
+    await eventRepository.save(event);
+
+    return res.json(event);
   }
 
   async delete(req: Request, res: Response) {
     const { id } = req.params;
     const userId = req.userId;
 
-    try {
-      const eventRepository = AppDataSource.getRepository(Event);
-      const userRepository = AppDataSource.getRepository(User);
+    const eventRepository = AppDataSource.getRepository(Event);
+    const userRepository = AppDataSource.getRepository(User);
 
-      const event = await eventRepository.findOneBy({ id });
+    const event = await eventRepository.findOneBy({ id });
 
-      if (!event) {
-        return res.status(404).json({ message: 'Evento não encontrado' });
-      }
-
-      const requestUser = await userRepository.findOneBy({ id: userId });
-      
-      if (event.userId !== userId && requestUser?.role !== 'admin') {
-        return res.status(403).json({ message: 'Voce não tem permissão para deletar este evento' });
-      }
-
-      await eventRepository.remove(event);
-
-      return res.status(204).send();
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Erro ao deletar evento' });
+    if (!event) {
+      throw new AppError('Evento não encontrado', 404);
     }
+
+    const requestUser = await userRepository.findOneBy({ id: userId });
+      
+    if (event.userId !== userId && requestUser?.role !== 'admin') {
+      throw new AppError('Voce não tem permissão para deletar este evento', 403);
+    }
+
+    await eventRepository.remove(event);
+    return res.status(204).send();
   }
 
   async show(req: Request, res: Response) {
     const { id } = req.params;
 
-    try {
-      const eventRepository = AppDataSource.getRepository(Event);
+    const eventRepository = AppDataSource.getRepository(Event);
       
-      const event = await eventRepository.findOne({
-        where: { id }, 
-        relations: ['category', 'user'] 
-      });
+    const event = await eventRepository.findOne({
+      where: { id }, 
+      relations: ['category', 'user'] 
+    });
 
-      if (!event) {
-        return res.status(404).json({ message: 'Evento não encontrado' });
-      }
-
-      return res.json(event);
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Erro ao buscar evento' });
+    if (!event) {
+      throw new AppError('Evento não encontrado', 404); 
     }
+
+    return res.json(event);
   }
 
 }

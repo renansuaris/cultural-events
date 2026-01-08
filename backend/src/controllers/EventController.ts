@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { AppDataSource } from '../data-source';
 import { Event } from '../entities/Event';
+import { User } from '../entities/User';
 
 export class EventController {
   
@@ -45,7 +46,7 @@ export class EventController {
     if (categoryId) {
       whereCondition.categoryId = categoryId;
     }
-    
+
     if (userId) {
       whereCondition.userId = userId;
     }
@@ -78,14 +79,23 @@ export class EventController {
   async update(req: Request, res: Response) {
     const { id } = req.params;
     const { title, date, location, description, categoryId } = req.body;
+    const userId = req.userId;
 
     try {
+
       const eventRepository = AppDataSource.getRepository(Event);
+      const userRepository = AppDataSource.getRepository(User); 
 
       const event = await eventRepository.findOneBy({ id });
 
       if (!event) {
         return res.status(404).json({ message: 'Evento não encontrado' });
+      }
+
+      const requestUser = await userRepository.findOneBy({ id: userId });
+      
+      if (event.userId !== userId && requestUser?.role !== 'admin') {
+        return res.status(403).json({ message: 'Voce não tem permissão pra editar esse evento!' });
       }
 
       event.title = title || event.title;
@@ -105,14 +115,22 @@ export class EventController {
 
   async delete(req: Request, res: Response) {
     const { id } = req.params;
+    const userId = req.userId;
 
     try {
       const eventRepository = AppDataSource.getRepository(Event);
-      
+      const userRepository = AppDataSource.getRepository(User);
+
       const event = await eventRepository.findOneBy({ id });
 
       if (!event) {
         return res.status(404).json({ message: 'Evento não encontrado' });
+      }
+
+      const requestUser = await userRepository.findOneBy({ id: userId });
+      
+      if (event.userId !== userId && requestUser?.role !== 'admin') {
+        return res.status(403).json({ message: 'Voce não tem permissão para deletar este evento' });
       }
 
       await eventRepository.remove(event);

@@ -117,9 +117,16 @@ export class UserController {
   }
 
   async index(req: Request, res: Response) {
+    const loggedUserId = req.userId;
+
     try {
       const userRepository = AppDataSource.getRepository(User);
       
+      const requester = await userRepository.findOneBy({ id: loggedUserId });
+      if (requester?.role !== 'admin') {
+        return res.status(403).json({ message: 'Acesso negado: Apenas administradores' });
+      }
+
       const users = await userRepository.find();
 
       const usersReturn = users.map(user => {
@@ -137,9 +144,16 @@ export class UserController {
   async updateRole(req: Request, res: Response) {
     const { id } = req.params;
     const { role } = req.body;
+    const loggedUserId = req.userId;
 
     try {
       const userRepository = AppDataSource.getRepository(User);
+
+      const requester = await userRepository.findOneBy({ id: loggedUserId });
+      if (requester?.role !== 'admin') {
+        return res.status(403).json({ message: 'Apenas administradores podem alterar permissões' });
+      }
+      
       const user = await userRepository.findOneBy({ id }); 
 
       if (!user) {

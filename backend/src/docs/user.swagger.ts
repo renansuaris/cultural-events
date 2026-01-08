@@ -1,6 +1,22 @@
 /**
  * @swagger
+ * tags:
+ *   - name: Users
+ *     description: Gerenciamento de usuários
+ */
+
+/**
+ * @swagger
  * /users:
+ *   get:
+ *     summary: Lista todos os usuários
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Lista de usuários
+ *
  *   post:
  *     summary: Cria um novo usuário
  *     tags: [Users]
@@ -59,6 +75,8 @@
  *     responses:
  *       200:
  *         description: Usuário atualizado
+ *       403:
+ *         description: Sem permissão
  *
  *   delete:
  *     summary: Deleta a conta do usuário
@@ -74,6 +92,40 @@
  *     responses:
  *       204:
  *         description: Conta deletada com sucesso
+ *       403:
+ *         description: Sem permissão
+ */
+
+/**
+ * @swagger
+ * /users/{id}/role:
+ *   patch:
+ *     summary: Altera o papel (permissão) do usuário (Apenas Admin)
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - role
+ *             properties:
+ *               role:
+ *                 type: string
+ *                 enum: [admin, user]
+ *     responses:
+ *       200:
+ *         description: Papel atualizado
+ *       403:
+ *         description: Sem permissão
  */
 
 /**
@@ -87,19 +139,6 @@
  *     responses:
  *       200:
  *         description: Dados do usuário
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: string
- *                 name:
- *                   type: string
- *                 email:
- *                   type: string
- *                 role:
- *                   type: string
  *       401:
- *         description: Não autorizado (Token inválido ou ausente)
+ *         description: Não autorizado
  */

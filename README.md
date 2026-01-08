@@ -49,7 +49,7 @@ Fortalecer a cultura local e dar visibilidade a artistas independentes, criando 
 
 ### 1. Visitante (Usuário não logado)
 - Visualizar a lista completa de eventos (com paginação)
-- Filtrar eventos por categoria, data ou localização
+- Filtrar eventos por categoria
 - Ver os detalhes completos de um evento específico
 - Realizar cadastro (criar uma nova conta)
 - Realizar login na plataforma

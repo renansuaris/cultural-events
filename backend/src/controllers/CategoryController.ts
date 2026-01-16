@@ -5,10 +5,10 @@ export class CategoryController {
   
   async create(req: Request, res: Response) {
     const { name } = req.body;
-    const userId = req.userId;
+    const { userId, userRole } = req;
 
     const categoryService = new CategoryService();
-    const newCategory = await categoryService.create(name, userId);
+    const newCategory = await categoryService.create(name, userId, userRole);
 
     return res.status(201).json(newCategory);
   }
@@ -21,10 +21,10 @@ export class CategoryController {
   
   async delete(req: Request, res: Response) {
     const { id } = req.params;
-    const userId = req.userId;
+    const { userId, userRole } = req;
 
     const categoryService = new CategoryService();
-    await categoryService.delete(id, userId);
+    await categoryService.delete(id, userId, userRole);
 
     return res.status(204).send();
   }

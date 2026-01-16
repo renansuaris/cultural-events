@@ -2,7 +2,7 @@ import { compare } from "bcryptjs";
 import { sign } from "jsonwebtoken";
 import { AppDataSource } from "../config/data-source";
 import { User } from "../entities/User";
-import { AppError } from "../errors/AppErrors";
+import { InvalidCredentialsError } from "../errors/AppErrors";
 
 type LoginRequest = {
   email: string;
@@ -16,16 +16,17 @@ export class AuthService {
     const user = await this.userRepository.findOneBy({ email });
 
     if (!user) {
-      throw new AppError('Email ou senha incorretos', 401);
+      throw new InvalidCredentialsError('Email ou senha incorretos');
     }
 
     const isValidPassword = await compare(password, user.password);
 
     if (!isValidPassword) {
-      throw new AppError('Email ou senha incorretos', 401);
+      throw new InvalidCredentialsError('Email ou senha incorretos');
     }
 
-    const token = sign({ id: user.id }, process.env.JWT_SECRET ?? '', { expiresIn: '3d' });
+    const token = sign({ id: user.id, role: user.role }, 
+      process.env.JWT_SECRET ?? '', { expiresIn: '3d' });
 
     const { password: _, ...userReturn } = user;
 

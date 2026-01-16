@@ -5,13 +5,11 @@ export class EventController {
   
   async create(req: Request, res: Response) {
     const { title, date, location, description, categoryId } = req.body;
-    const userId = req.userId;
+    const { userId, userRole } = req;
 
     const eventService = new EventService();
     const newEvent = await eventService.create(
-      { title, date, location, description, categoryId }, 
-      userId
-    );
+      { title, date, location, description, categoryId }, userId);
 
     return res.status(201).json(newEvent);
   }
@@ -28,17 +26,17 @@ export class EventController {
     const { title, date, location, description, categoryId } = req.body;
 
     const eventService = new EventService();
-    const event = await eventService.update(id, { title, date, location, description, categoryId }, userId);
+    const event = await eventService.update(id, { title, date, location, description, categoryId }, userId, req.userRole);
 
     return res.json(event);
   }
 
   async delete(req: Request, res: Response) {
     const { id } = req.params;
-    const userId = req.userId;
+    const { userId, userRole } = req;
 
     const eventService = new EventService();
-    await eventService.delete(id, userId);
+    await eventService.delete(id, userId, userRole);
 
     return res.status(204).send();
   }

@@ -1,18 +1,16 @@
 import { AppDataSource } from '../config/data-source';
 import { Event } from '../entities/Event';
-import { User } from '../entities/User';
 import { Category } from '../entities/Category';
-import { AppError } from '../errors/AppErrors';
+import { ForbiddenError, NotFoundError } from '../errors/AppErrors';
 
 export class EventService {
   private eventRepository = AppDataSource.getRepository(Event);
-  private userRepository = AppDataSource.getRepository(User);
   private categoryRepository = AppDataSource.getRepository(Category);
 
   async create(data: any, userId: string) {
     const categoryExists = await this.categoryRepository.findOneBy({ id: data.categoryId });
     if (!categoryExists) {
-        throw new AppError('Categoria não encontrada', 404);
+        throw new NotFoundError('Categoria não encontrada');
     }
 
     const newEvent = this.eventRepository.create({
@@ -54,19 +52,17 @@ export class EventService {
     };
   }
 
-  async update(id: string, data: any, userId: string) {
+  async update(id: string, data: any, userId: string, userRole: string) {
     const event = await this.eventRepository.findOneBy({ id });
-    if (!event) throw new AppError('Evento não encontrado', 404);
-
-    const requestUser = await this.userRepository.findOneBy({ id: userId });
+    if (!event) throw new NotFoundError('Evento não encontrado');
       
-    if (event.userId !== userId && requestUser?.role !== 'admin') {
-      throw new AppError('Você não tem permissão para editar este evento', 403);
+    if (event.userId !== userId && userRole !== 'admin') {
+      throw new ForbiddenError('Você não tem permissão para editar este evento');
     }
 
     if (data.categoryId) {
         const categoryExists = await this.categoryRepository.findOneBy({ id: data.categoryId });
-        if (!categoryExists) throw new AppError('Categoria não encontrada', 404);
+        if (!categoryExists) throw new NotFoundError('Categoria não encontrada');
     }
 
     Object.assign(event, data);
@@ -75,14 +71,12 @@ export class EventService {
     return event;
   }
 
-  async delete(id: string, userId: string) {
+  async delete(id: string, userId: string, userRole: string) {
     const event = await this.eventRepository.findOneBy({ id });
-    if (!event) throw new AppError('Evento não encontrado', 404);
-
-    const requestUser = await this.userRepository.findOneBy({ id: userId });
+    if (!event) throw new NotFoundError('Evento não encontrado');
       
-    if (event.userId !== userId && requestUser?.role !== 'admin') {
-      throw new AppError('Você não tem permissão para deletar este evento', 403);
+    if (event.userId !== userId && userRole !== 'admin') {
+      throw new ForbiddenError('Você não tem permissão para deletar este evento');
     }
 
     await this.eventRepository.remove(event);
@@ -94,7 +88,7 @@ export class EventService {
       relations: ['category', 'user'] 
     });
 
-    if (!event) throw new AppError('Evento não encontrado', 404);
+    if (!event) throw new NotFoundError('Evento não encontrado');
     return event;
   }
 }

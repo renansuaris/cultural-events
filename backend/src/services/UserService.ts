@@ -1,7 +1,7 @@
 import { hash } from 'bcryptjs';
 import { AppDataSource } from '../config/data-source';
 import { User } from '../entities/User';
-import { AppError } from '../errors/AppErrors';
+import { ConflictError, ForbiddenError, NotFoundError } from '../errors/AppErrors';
 
 export class UserService {
   private userRepository = AppDataSource.getRepository(User);
@@ -10,7 +10,7 @@ export class UserService {
 
     const userExists = await this.userRepository.findOneBy({ email });
     if (userExists) {
-      throw new AppError('E-mail já cadastrado', 409);
+      throw new ConflictError('E-mail já cadastrado');
     }
 
     const passwordHash = await hash(password, 10);
@@ -24,11 +24,11 @@ export class UserService {
 
   async update(id: string, userId: string, { name, email, password }: any) {
     if (id !== userId) {
-        throw new AppError('Você não tem permissão para alterar este usuário', 403);
+        throw new ForbiddenError('Não tens permissao para alterar este usuário');
     }
 
     const user = await this.userRepository.findOneBy({ id }); 
-    if (!user) throw new AppError('Usuário não encontrado', 404);
+    if (!user) throw new NotFoundError('Usuário não encontrado');
 
     user.name = name || user.name;
     user.email = email || user.email;
@@ -42,30 +42,27 @@ export class UserService {
     return userReturn;
   }
 
-  async delete(id: string, loggedUserId: string) {
-    const requester = await this.userRepository.findOneBy({ id: loggedUserId });
-      
-    if (id !== loggedUserId && requester?.role !== 'admin') {
-        throw new AppError('Sem permissão', 403);
+  async delete(id: string, loggedUserId: string, userRole: string) {      
+    if (id !== loggedUserId && userRole !== 'admin') {
+        throw new ForbiddenError('Sem permissão');
     }
 
     const user = await this.userRepository.findOneBy({ id }); 
-    if (!user) throw new AppError('Usuário não encontrado', 404);
+    if (!user) throw new NotFoundError('Usuário não encontrado');
 
     await this.userRepository.remove(user);
   }
 
   async getProfile(userId: string) {
     const user = await this.userRepository.findOneBy({ id: userId }); 
-    if (!user) throw new AppError('Usuário não encontrado', 404);
+    if (!user) throw new NotFoundError('Usuario não encontrado');
     const { password: _, ...userReturn } = user;
     return userReturn;
   }
 
-  async listAll(loggedUserId: string) {
-    const requester = await this.userRepository.findOneBy({ id: loggedUserId });
-    if (requester?.role !== 'admin') {
-      throw new AppError('Acesso negado: Apenas administradores', 403);
+  async listAll(userRole: string) {
+    if (userRole !== 'admin') {
+      throw new ForbiddenError('Acesso negado: Apenas administradores');
     }
 
     const users = await this.userRepository.find();
@@ -75,15 +72,13 @@ export class UserService {
     });
   }
 
-  async updateRole(id: string, role: any, loggedUserId: string) {
-    const requester = await this.userRepository.findOneBy({ id: loggedUserId });
-    if (requester?.role !== 'admin') {
-      throw new AppError('Apenas administradores podem alterar permissões', 403);
+  async updateRole(id: string, role: any, loggedUserId: string, userRole: string) {
+    if (userRole !== 'admin') {
+      throw new ForbiddenError('Apenas administradores podem alterar permissões');
     }
       
     const user = await this.userRepository.findOneBy({ id }); 
-    if (!user) throw new AppError('Usuário não encontrado', 404);
-
+    if (!user) throw new NotFoundError('Usuário não encontrado');
     user.role = role;
     await this.userRepository.save(user);
   }

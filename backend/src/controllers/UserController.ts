@@ -1,8 +1,7 @@
-import { Request, Response } from 'express';
-import { UserService } from '../services/UserService';
+import { Request, Response } from "express";
+import { UserService } from "../services/UserService";
 
 export class UserController {
-  
   async create(req: Request, res: Response) {
     const { name, email, password } = req.body;
     const userService = new UserService();
@@ -13,20 +12,24 @@ export class UserController {
   async update(req: Request, res: Response) {
     const { id } = req.params;
     const { name, email, password } = req.body;
-    const loggedUserId = req.userId; 
+    const loggedUserId = req.userId;
 
     const userService = new UserService();
-    const user = await userService.update(id, loggedUserId, { name, email, password });
-    
+    const user = await userService.update(id, loggedUserId, {
+      name,
+      email,
+      password,
+    });
+
     return res.json(user);
   }
 
   async delete(req: Request, res: Response) {
     const { id } = req.params;
-    const loggedUserId = req.userId;
+    const { userId, userRole } = req;
 
     const userService = new UserService();
-    await userService.delete(id, loggedUserId);
+    await userService.delete(id, userId, userRole);
 
     return res.status(204).send();
   }
@@ -38,18 +41,20 @@ export class UserController {
   }
 
   async index(req: Request, res: Response) {
+    const { userId, userRole } = req;
+
     const userService = new UserService();
-    const users = await userService.listAll(req.userId);
+    const users = await userService.listAll(userRole);
     return res.json(users);
   }
 
   async updateRole(req: Request, res: Response) {
     const { id } = req.params;
     const { role } = req.body;
-    const loggedUserId = req.userId;
+    const { userId, userRole } = req;
 
     const userService = new UserService();
-    await userService.updateRole(id, role, loggedUserId);
-    return res.json({ message: 'Papel atualizado com sucesso' });
+    await userService.updateRole(id, role, userId, userRole);
+    return res.json({ message: "Papel atualizado com sucesso" });
   }
 }

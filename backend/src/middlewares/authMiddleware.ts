@@ -1,8 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import { verify } from 'jsonwebtoken';
+import { UnauthorizedError } from '../errors/AppErrors';
 
 type TokenPayload = {
   id: string;
+  role: string;
   iat: number;
   exp: number;
 };
@@ -15,7 +17,7 @@ export async function authMiddleware(
   const { authorization } = req.headers;
 
   if (!authorization) {
-    return res.status(401).json({ message: 'Token não fornecido' });
+    throw new UnauthorizedError('Token não fornecido');
   }
 
   const [, token] = authorization.split(' ');
@@ -23,12 +25,13 @@ export async function authMiddleware(
   try {
     const decoded = verify(token, process.env.JWT_SECRET ?? '');
     
-    const { id } = decoded as TokenPayload;
+    const { id, role } = decoded as TokenPayload;
 
     req.userId = id;
+    req.userRole = role;
 
     return next();
   } catch (error) {
-    return res.status(401).json({ message: 'Token inválido' });
+    throw new UnauthorizedError('Token inválido ou expirado');
   }
 }

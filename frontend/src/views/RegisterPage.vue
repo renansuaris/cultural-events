@@ -100,7 +100,8 @@ async function handleSubmit() {
     password: password.value
   })
   if (result.success) {
-    router.push({ name: 'home' })
+    alert('Conta criada com sucesso! Por favor, faça login para continuar.')
+    router.push({ name: 'login' })
   } else {
     errors.api = result.error || 'Ocorreu um erro desconhecido.'
   }

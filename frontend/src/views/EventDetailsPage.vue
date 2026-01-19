@@ -82,7 +82,7 @@ hr {
 
 .back-link {
   text-decoration: none;
-  color: #007bff;
+  color: var(--primary);
   font-weight: 700;
 }
 .back-link:hover {

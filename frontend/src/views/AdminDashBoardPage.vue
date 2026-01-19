@@ -62,30 +62,29 @@ h1 {
   background-color: #fff;
   padding: 2rem;
   border-radius: 8px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.05);
   text-decoration: none;
   color: inherit;
-  transition: transform 0.2s, box-shadow 0.2s;
   border: 1px solid #eee;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  transition: border-color 0.2s, background-color 0.2s;
 }
 
 .dashboard-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 15px rgba(0,0,0,0.1);
-  border-color: #007bff;
+  border-color: var(--primary);
+  background-color: #fafafa;
 }
 
 .card-icon {
   font-size: 2.5rem;
   margin-bottom: 1rem;
+  color: var(--text-dark); 
 }
 
 .dashboard-card h3 {
   margin: 0 0 0.5rem 0;
-  color: #007bff;
+  color: var(--primary); 
 }
 
 .dashboard-card p {

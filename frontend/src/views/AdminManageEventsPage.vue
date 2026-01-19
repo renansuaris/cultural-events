@@ -72,23 +72,25 @@
 import { ref, onMounted } from 'vue'
 import { useEventStore } from '@/stores/event.store'
 import { RouterLink } from 'vue-router'
+import { useToast } from 'vue-toastification'
 import { formatDate } from '@/utils/formatDate'
 
 const eventStore = useEventStore()
 const isLoading = ref(true)
+const toast = useToast()
 
 onMounted(async () => {
-  await eventStore.fetchAllEvents()
+  await eventStore.fetchAllEvents(undefined, 1, 100)
   isLoading.value = false
 })
 
 async function handleDelete(id: string) {
-  if (confirm('Admin: Tem certeza que deseja excluir este evento permanentemente?')) {
-    const success = await eventStore.deleteEvent(id)
-    if (!success) {
-      alert('Erro ao excluir evento.')
-    } else {
-      await eventStore.fetchAllEvents()
+  if (confirm('Admin: Tem certeza que deseja excluir este evento?')) {
+    try {
+      await eventStore.deleteEvent(id)
+      toast.success('Evento excluído com sucesso.')
+    } catch (error) {
+      toast.error('Erro ao excluir evento.')
     }
   }
 }
@@ -183,7 +185,7 @@ h1 {
 
 .badge {
   background-color: #eff6ff;
-  color: #2563eb;
+  color: var(--primary);
   padding: 4px 10px;
   border-radius: 20px;
   font-size: 0.75rem;

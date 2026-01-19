@@ -1,8 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { OneToMany } from "typeorm";
 import { Event } from "./Event";
-
-export type UserRole = "user" | "admin";
+import { UserRoles } from "../constants/roles";
 
 @Entity("users")
 export class User {
@@ -15,14 +14,14 @@ export class User {
   @Column({ unique: true })
   email: string;
 
-  @Column()
+  @Column({ select: false })
   password: string;
 
   @Column({
     type: "text",
-    default: "user",
+    default: UserRoles.USER,
   })
-  role: UserRole;
+  role: UserRoles;
 
   @OneToMany(() => Event, (event) => event.user)
   events: Event[];

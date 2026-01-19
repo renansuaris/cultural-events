@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { extendZodWithOpenApi } from '@asteasolutions/zod-to-openapi';
 import { registry } from '../config/openapi';
+import { UserRoles } from '../constants/roles';
 
 extendZodWithOpenApi(z);
 
@@ -23,7 +24,10 @@ export const updateUserSchema = z.object({
 
 export const updateRoleSchema = z.object({
   body: z.object({
-    role: z.enum(['admin', 'user']).openapi({ example: 'admin' }),
+    role: z.nativeEnum(UserRoles).openapi({ 
+      example: UserRoles.ADMIN,
+      description: 'Papel do usuário no sistema'
+    }),
   }),
   params: z.object({
     id: z.string().uuid(),

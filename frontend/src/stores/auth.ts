@@ -1,65 +1,30 @@
 import { ref, computed } from 'vue' 
 import { defineStore } from 'pinia'
-import api from '@/services/api'
-
-type UserRole = 'admin' | 'user' | null
-
-type RegisterData = {
-  name: string
-  email: string
-  password: string
-}
-
-export interface IUser {
-  id: string
-  name: string
-  email: string
-  role: UserRole
-}
-
-type LoginData = {
-  email: string
-  password: string
-}
+import AuthService from '@/services/AuthService'
+import type { User, UserRole, LoginDTO, RegisterDTO, UpdateProfileDTO } from '@/types'
 
 export const useAuthStore = defineStore('auth', () => {
   
   const isLoggedIn = ref(false)
-  const userRole = ref<UserRole>(null) 
+  const userRole = ref<UserRole | null>(null)
   const userId = ref<string | null>(null)
   const userName = ref<string>('')
-
-  const usersList = ref<IUser[]>([])
-
+  const usersList = ref<User[]>([])
   const isAdmin = computed(() => userRole.value === 'admin')
 
-  async function login(loginData: LoginData) {
-    try {
-      const { data } = await api.post('/login', loginData)
-      const { user, token } = data
-      setAuthState(user.role, user.id, user.name)
-      
-      localStorage.setItem('token', token)
-      localStorage.setItem('user', JSON.stringify(user)) 
+  async function login(loginData: LoginDTO) {
+    const data = await AuthService.login(loginData)
+    const { user, token } = data
+    
+    setAuthState(user.role, user.id, user.name)
+    localStorage.setItem('token', token)
+    localStorage.setItem('user', JSON.stringify(user)) 
 
-      return { success: true, role: user.role }
-    } catch (error: any) {
-      console.error(error)
-      const msg = error.response?.data?.message || 'Erro de conexão'
-      return { success: false, error: msg }
-    }
+    return user 
   }
 
-  async function register(registerData: RegisterData) {
-    try {
-      const { data } = await api.post('/users', registerData)
-
-      return { success: true }
-
-    } catch (error: any) {
-      const msg = error.response?.data?.message || 'Erro ao cadastrar'
-      return { success: false, error: msg }
-    }
+  async function register(registerData: RegisterDTO) {
+    await AuthService.register(registerData)
   }
 
   function checkToken() {
@@ -69,28 +34,23 @@ export const useAuthStore = defineStore('auth', () => {
     if (token && userStored) {
       const user = JSON.parse(userStored)
       setAuthState(user.role, user.id, user.name)
-    } else {
-      logout()
+    } else { 
+      logout() 
     }
   }
 
   async function fetchAllUsers() {
     try {
-      const { data } = await api.get('/users') 
+      const data = await AuthService.fetchAllUsers()
       usersList.value = data
     } catch (error) {
-      console.error(error)
+      console.error('Falha ao obter usuarios', error)
     }
   }
 
   async function deleteUser(id: string) {
-    try {
-      await api.delete(`/users/${id}`)
-      await fetchAllUsers() 
-      return true
-    } catch (error) {
-      return false
-    }
+    await AuthService.deleteUser(id)
+    await fetchAllUsers() 
   }
 
   function logout() {
@@ -104,31 +64,19 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   async function updateUserRole(id: string, newRole: UserRole) {
-    try {
-      await api.patch(`/users/${id}/role`, { role: newRole })
-      await fetchAllUsers()
-      return true
-    } catch (error) {
-      console.error('Erro ao atualizar papel:', error)
-      return false
-    }
+    await AuthService.updateRole(id, newRole)
+    await fetchAllUsers()
   }
 
-  async function updateProfile(id: string, updateData: any) {
-      try {
-          await api.put(`/users/${id}`, updateData)
-          
-          if (userId.value === id) {
-              userName.value = updateData.name
-              const userStored = JSON.parse(localStorage.getItem('user') || '{}')
-              userStored.name = updateData.name
-              userStored.email = updateData.email
-              localStorage.setItem('user', JSON.stringify(userStored))
-          }
-          
-          return true
-      } catch (error) {
-          return false
+  async function updateProfile(id: string, updateData: UpdateProfileDTO) {
+      await AuthService.updateProfile(id, updateData)
+    
+      if (userId.value === id) {
+          userName.value = updateData.name
+          const userStored = JSON.parse(localStorage.getItem('user') || '{}')
+          userStored.name = updateData.name
+          userStored.email = updateData.email
+          localStorage.setItem('user', JSON.stringify(userStored))
       }
   }
 

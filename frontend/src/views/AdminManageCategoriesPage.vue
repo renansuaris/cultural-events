@@ -14,12 +14,13 @@
             v-model="newCategoryName" 
             placeholder="Ex: Música, Teatro, Workshop..."
             class="form-input"
+            :class="{ 'is-invalid': errors.name }"
           />
           <button type="submit" class="btn-add">
             + Adicionar
           </button>
         </form>
-        <p v-if="error" class="error-msg">{{ error }}</p>
+        <span v-if="errors.name" class="error-msg">{{ errors.name }}</span>
       </div>
 
       <hr class="divider" />
@@ -51,45 +52,51 @@
 
 import { ref, onMounted } from 'vue'
 import { useCategoryStore } from '@/stores/category.store' 
+import { useToast } from 'vue-toastification'
+import { useFormHandler } from '@/composables/useFormHandler'
 
 const categoryStore = useCategoryStore()
-
 const newCategoryName = ref('')
-const error = ref('')
+const toast = useToast()
+const { errors, execute } = useFormHandler()
 
 onMounted(() => {
   categoryStore.fetchAllCategories()
 })
 
 async function handleCreate() {
-
   if (newCategoryName.value.trim() === '') {
-    error.value = 'O nome da categoria não pode estar vazio.'
+    toast.warning('O nome da categoria não pode estar vazio.')
     return
   }
-  
-  error.value = '' 
-  
-  const success = await categoryStore.createCategory(newCategoryName.value)
-  
-  if (success) {
-    newCategoryName.value = '' 
-  } else {
-    error.value = 'Erro ao tentar criar a categoria.'
-  }
+
+  await execute(
+    () => categoryStore.createCategory(newCategoryName.value),
+    () => {
+      toast.success('Categoria criada com sucesso!')
+      newCategoryName.value = '' 
+    }
+  )
 }
 
 async function handleDelete(id: string) {
   if (confirm('Tem certeza que deseja deletar esta categoria?')) {
-    const success = await categoryStore.deleteCategory(id)
-    if (!success) {
-      alert('Erro ao tentar deletar a categoria.')
+    try {
+      await categoryStore.deleteCategory(id)
+      toast.success('Categoria removida.')
+    } catch (error) {
+      toast.error('Erro ao tentar deletar a categoria.')
     }
   }
 }
 </script>
 
 <style scoped>
+
+.is-invalid {
+  border-color: #dc3545 !important;
+  background-color: #fff8f8;
+}
 
 .container {
   max-width: 800px; 
@@ -144,7 +151,7 @@ h3 {
 
 .btn-add {
   padding: 0.6rem 1.2rem;
-  background-color: #007bff;
+  background-color: var(--primary);
   color: white;
   border: none;
   border-radius: 4px;
@@ -152,9 +159,15 @@ h3 {
   font-weight: bold;
   transition: 0.2s;
 }
-.btn-add:hover { background-color: #0056b3; }
+.btn-add:hover { 
+  background-color: var(--primary-hover);
+ }
 
-.error-msg { color: #dc3545; font-size: 0.9rem; margin-top: 0.5rem; }
+.error-msg { 
+  color: #dc3545; 
+  font-size: 0.9rem; 
+  margin-top: 0.5rem; 
+}
 
 .divider {
   border: 0;

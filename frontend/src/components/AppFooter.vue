@@ -49,7 +49,7 @@ import { RouterLink } from 'vue-router'
 }
 
 .footer-links a:hover {
-  color: #007bff;
+  color: var(--primary);
   text-decoration: underline;
 }
 </style>

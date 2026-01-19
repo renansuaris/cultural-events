@@ -48,14 +48,12 @@ defineProps<{
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: border-color 0.2s; 
   height: 100%; 
 }
 
 .event-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 20px rgba(0,0,0,0.08);
-  border-color: #007bff;
+  border-color: var(--primary); 
 }
 
 .card-header {
@@ -64,7 +62,7 @@ defineProps<{
 
 .category-badge {
   background-color: #e3f2fd; 
-  color: #007bff; 
+  color: var(--primary);
   padding: 0.35rem 0.75rem;
   border-radius: 50px; 
   font-size: 0.75rem;
@@ -131,7 +129,7 @@ defineProps<{
 }
 
 .btn-details:hover {
-  background-color: #007bff;
+  background-color: var(--primary);
   color: white;
 }
 </style>

@@ -1,6 +1,7 @@
 <template>
   <div class="form-container">
     <form @submit.prevent="handleSubmit">
+      
       <div class="form-group">
         <label for="title">Título do Evento:</label>
         <input 
@@ -8,14 +9,18 @@
           id="title" 
           v-model="formData.title" 
           class="form-control"
-          placeholder="Ex: Show de Rock no Centro"
+          :class="{ 'is-invalid': serverErrors?.title }"
+          placeholder="Ex: Show de Rock na praã do leão"
         />
-        <p v-if="errors.title" class="error">{{ errors.title }}</p>
+        <span v-if="serverErrors?.title" class="error">{{ serverErrors.title }}</span>
       </div>
 
       <div class="form-group">
         <label for="category">Categoria:</label>
-        <select id="category" v-model="formData.categoryId" class="form-control">
+        <select id="category"
+         v-model="formData.categoryId" 
+         class="form-control"
+         :class="{ 'is-invalid': serverErrors?.categoryId }">
           <option value="" disabled>Selecione uma categoria...</option>
           <option 
             v-for="category in categoryStore.categories" 
@@ -25,7 +30,7 @@
             {{ category.name }}
           </option>
         </select>
-        <p v-if="errors.categoryId" class="error">{{ errors.categoryId }}</p>
+        <span v-if="serverErrors?.categoryId" class="error">{{ serverErrors.categoryId }}</span>
       </div>
 
       <div class="form-group">
@@ -35,8 +40,9 @@
           id="date" 
           v-model="formData.date" 
           class="form-control"
+          :class="{ 'is-invalid': serverErrors?.date }"
         />
-        <p v-if="errors.date" class="error">{{ errors.date }}</p>
+        <span v-if="serverErrors?.date" class="error">{{ serverErrors.date }}</span>
       </div>
 
       <div class="form-group">
@@ -46,9 +52,10 @@
           id="location" 
           v-model="formData.location" 
           class="form-control"
+          :class="{ 'is-invalid': serverErrors?.location }"
           placeholder="Ex: Teatro Municipal"
         />
-        <p v-if="errors.location" class="error">{{ errors.location }}</p>
+        <span v-if="serverErrors?.location" class="error">{{ serverErrors.location }}</span>
       </div>
 
       <div class="form-group">
@@ -57,10 +64,11 @@
           id="description" 
           v-model="formData.description" 
           class="form-control" 
+          :class="{ 'is-invalid': serverErrors?.description }"
           rows="5"
           placeholder="Detalhes sobre o evento..."
         ></textarea>
-        <p v-if="errors.description" class="error">{{ errors.description }}</p>
+        <span v-if="serverErrors?.description" class="error">{{ serverErrors.description }}</span>
       </div>
 
       <button type="submit" class="btn-submit" :disabled="isLoading">
@@ -71,8 +79,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, reactive, watch } from 'vue'
+import { onMounted, reactive, watch } from 'vue'
 import { useCategoryStore } from '@/stores/category.store'
+import { toInputDate } from '@/utils/formatDate';
 
 const props = defineProps<{
   initialData?: {
@@ -84,21 +93,13 @@ const props = defineProps<{
   }
   buttonText?: string
   isLoading?: boolean
+  serverErrors?: Record<string, string>
 }>()
 
 const emit = defineEmits(['submit'])
-
 const categoryStore = useCategoryStore()
 
 const formData = reactive({
-  title: '',
-  categoryId: '',
-  date: '',
-  location: '',
-  description: ''
-})
-
-const errors = reactive({
   title: '',
   categoryId: '',
   date: '',
@@ -117,43 +118,13 @@ watch(() => props.initialData, (newData) => {
     formData.location = newData.location
     formData.description = newData.description
     if (newData.date) {
-        formData.date = newData.date.slice(0, 16)
+        formData.date = toInputDate(newData.date)
     }
   }
 }, { immediate: true })
 
-function validate() {
-  let isValid = true
-  Object.keys(errors).forEach(key => (errors as any)[key] = '')
-
-  if (!formData.title) {
-    errors.title = 'Título é obrigatório'
-    isValid = false
-  }
-  if (!formData.categoryId) {
-    errors.categoryId = 'Categoria é obrigatória'
-    isValid = false
-  }
-  if (!formData.date) {
-    errors.date = 'Data é obrigatória'
-    isValid = false
-  }
-  if (!formData.location) {
-    errors.location = 'Local é obrigatório'
-    isValid = false
-  }
-  if (!formData.description) {
-    errors.description = 'Descrição é obrigatória'
-    isValid = false
-  }
-
-  return isValid
-}
-
 function handleSubmit() {
-  if (validate()) {
-    emit('submit', { ...formData })
-  }
+  emit('submit', { ...formData })
 }
 </script>
 
@@ -185,7 +156,7 @@ label {
 }
 
 .form-control:focus {
-  border-color: #4a90e2;
+  border-color: var(--primary-light);
   outline: none;
   box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
 }
@@ -199,7 +170,7 @@ label {
 .btn-submit {
   width: 100%;
   padding: 1rem;
-  background-color: #4871fa;
+  background-color: var(--primary-light);
   color: white;
   border: none;
   border-radius: 4px;

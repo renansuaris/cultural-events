@@ -7,23 +7,32 @@
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
           <label for="email">Email:</label>
-          <input type="email" id="email" v-model="email" />
+          <input 
+            type="email"
+            id="email"
+            v-model="email"
+            :class="{ 'is-invalid': errors.email }"
+            />
+            <span v-if="errors.email" class="error">{{ errors.email }}</span>
         </div>
         <div class="form-group">
           <label for="password">Senha:</label>
-          <input type="password" id="password" v-model="password" />
+          <input 
+            type="password"
+            id="password"
+            v-model="password" 
+            :class="{ 'is-invalid': errors.password }"
+          />
+          <span v-if="errors.password" class="error">{{ errors.password }}</span>
         </div>
 
-        <p v-if="apiError" class="error">{{ apiError }}</p>
-
-        <button type="submit" class="btn-submit">Entrar</button>
+        <button type="submit" class="btn-submit" :disabled="isLoading">
+          {{ isLoading ? 'Entrando...' : 'Entrar' }}
+        </button>
       </form>
 
       <div class="register-link">
-        <p>
-          Não tem cadastro ainda?
-          <RouterLink :to="{ name: 'register' }">Cadastre-se</RouterLink>
-        </p>
+        <p> Não tem cadastro ainda? <RouterLink :to="{ name: 'register' }">Cadastre-se</RouterLink></p>
       </div>
     </div>
   </main>
@@ -34,37 +43,42 @@
 import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useRouter, RouterLink } from 'vue-router'
+import { useFormHandler } from '@/composables/useFormHandler'
+import { useToast } from 'vue-toastification'
 
 const email = ref('')
 const password = ref('')
-const apiError = ref('') 
-
 const authStore = useAuthStore()
 const router = useRouter()
+const toast = useToast()
+
+const { isLoading, errors, execute } = useFormHandler()
 
 async function handleSubmit() {
-  apiError.value = ''
-  if (!email.value || !password.value) {
-    apiError.value = 'Por favor, preencha email e senha.'
-    return
-  }
-  const result = await authStore.login({
-    email: email.value,
-    password: password.value
-  })
-  if (result.success) {
-    if (result.role === 'admin') {
-      router.push({ name: 'admin-dashboard' })
-    } else {
-      router.push({ name: 'home' })
+  await execute(
+    async () => authStore.login({
+      email: email.value,
+      password: password.value
+    }),
+    
+    (user) => {
+      toast.success(`Bem-vindo de volta, ${user.name}`)
+
+      if (user.role === 'admin') {
+        router.push({ name: 'admin-dashboard' })
+      } else {
+        router.push({ name: 'home' })
+      }
     }
-  } else {
-    apiError.value = result.error || 'Ocorreu um erro desconhecido.'
-  }
+  )
 }
 </script>
 
 <style scoped>
+
+.is-invalid {
+  border-color: #dc3545 !important;
+}
 
 .form-page-container {
   display: flex;
@@ -120,7 +134,7 @@ p {
 
 .form-group input:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: var(--primary);
   box-shadow: 0 0 0 2px rgba(0,123,255,0.2);
 }
 
@@ -130,7 +144,7 @@ p {
   font-size: 1.1rem;
   font-weight: 700;
   color: white;
-  background-color: #007bff;
+  background-color: var(--primary);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -138,7 +152,7 @@ p {
 }
 
 .btn-submit:hover {
-  background-color: #0056b3;
+  background-color: var(--primary-hover);
 }
 
 .register-link {
@@ -148,7 +162,7 @@ p {
   font-size: 0.9rem;
 }
 .register-link a {
-  color: #007bff;
+  color: var(--primary);
   font-weight: 700;
   text-decoration: none;
 }

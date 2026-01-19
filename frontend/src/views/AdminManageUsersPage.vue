@@ -54,26 +54,39 @@
 
 <script setup lang="ts">
 import { onMounted } from 'vue'
-import { useAuthStore, type IUser } from '@/stores/auth'
+import { useAuthStore } from '@/stores/auth'
+import type { User } from '@/types'
 import { RouterLink } from 'vue-router'
+import { useToast } from 'vue-toastification'
 
 const authStore = useAuthStore()
+const toast = useToast()
 
 onMounted(() => {
   authStore.fetchAllUsers()
 })
 
 async function handleDelete(id: string) {
-  if (confirm('Tem certeza que deseja excluir este usuário? Esta ação é irreversível.')) {
-    await authStore.deleteUser(id)
+  if (confirm('Tem certeza que deseja excluir este usuário?')) {
+    try {
+      await authStore.deleteUser(id)
+      toast.success('Usuário removido com sucesso!')
+    } catch (error) {
+      toast.error('Erro ao excluir usuário.')
+    }
   }
 }
 
-async function toggleRole(user: IUser) {
+async function toggleRole(user: User) {
   const newRole = user.role === 'admin' ? 'user' : 'admin'
   
   if (confirm(`Deseja alterar o papel de ${user.name} para "${newRole}"?`)) {
-    await authStore.updateUserRole(user.id, newRole)
+    try {
+      await authStore.updateUserRole(user.id, newRole)
+      toast.success(`Papel alterado para ${newRole}`)
+    } catch (error) {
+      toast.error("Erro ao alterar permissões do usuário.")
+    }
   }
 }
 </script>
@@ -123,7 +136,7 @@ async function toggleRole(user: IUser) {
 }
 .role-badge.admin {
   background-color: #e0e7ff; 
-  color: #3730a3;
+  color: var(--primary-hover);
 }
 .role-badge.user {
   background-color: #ecfccb; 

@@ -1,144 +1,165 @@
 <template>
-  <main>
-    <section class="hero-section">
-      <div class="container">
-        <h1>Muito mais que eventos.</h1>
-        <p class="hero-subtitle">Conectando pessoas a experiências culturais únicas na nossa cidade.</p>
-      </div>
-    </section>
+  <main class="about-container">
+    <div class="about-grid">
+      
+      <div class="text-content">
+        <span class="pre-title">Cultural Events</span>
+        <h1>SOBRE NÓS</h1>
+        <div class="separator"></div>
+        
+        <p>
+          O <strong>Cultural Events</strong> nasceu de um desejo simples: conectar pessoas a experiências inesquecíveis. 
+          Somos um projeto acadêmico focado em facilitar o acesso à cultura, permitindo que produtores locais divulguem seu trabalho e que o público descubra o que há de melhor na cidade.
+        </p>
+        
+        <p>
+          Acreditamos que a cultura deve ser acessível, vibrante e comunitária. Seja um show de rock, uma peça de teatro ou um workshop de arte, seu lugar é aqui.
+        </p>
 
-    <section class="features-section container">
-      <div class="feature-card">
-        <div class="icon-circle">
-          <font-awesome-icon icon="champagne-glasses" />
-        </div>
-        <h3>Viva Experiências</h3>
-        <p>Descubra shows, teatros e workshops acontecendo perto de você. A cultura local nunca esteve tão acessível.</p>
-      </div>
-
-      <div class="feature-card">
-        <div class="icon-circle">
-          <font-awesome-icon icon="calendar-days" />
-        </div>
-        <h3>Para Produtores</h3>
-        <p>Organize seus eventos de forma simples. Publique, gerencie e alcance seu público em poucos cliques.</p>
+        <button class="btn-learn-more">
+          Saiba Mais
+        </button>
       </div>
 
-      <div class="feature-card">
-        <div class="icon-circle">
-          <font-awesome-icon icon="users" />
+      <div class="visual-content">
+        <div class="blob-bg"></div>
+        <div class="illustration-placeholder">
+          <font-awesome-icon icon="users" class="hero-icon" />
         </div>
-        <h3>Comunidade</h3>
-        <p>Faça parte de uma comunidade apaixonada por arte e entretenimento. Compartilhe momentos.</p>
       </div>
-    </section>
 
-    <section class="about-project-section">
-      <div class="container">
-        <div class="content-box">
-          <h2>Sobre o Projeto</h2>
-          <p>
-            O <strong>Cultural Events</strong> nasceu como um projeto acadêmico 
-            com o objetivo de conectar pessoas a eventos de maneira simples e intuitiva.
-          </p>
-        </div>
-      </div>
-    </section>
+    </div>
   </main>
 </template>
 
 <script setup lang="ts">
+
 </script>
 
 <style scoped>
-.hero-section {
-  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); /* Azul Sympla adaptado */
-  color: white;
-  padding: 5rem 1rem;
-  text-align: center;
-}
-
-.hero-section h1 {
-  font-size: 3rem;
-  font-weight: 800;
-  margin-bottom: 1rem;
-}
-
-.hero-subtitle {
-  font-size: 1.25rem;
-  opacity: 0.9;
-  max-width: 600px;
+.about-container {
+  max-width: 1200px;
   margin: 0 auto;
-}
-
-.features-section {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-  padding: 4rem 1rem;
-}
-
-.feature-card {
-  text-align: center;
-  padding: 2rem;
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-  transition: transform 0.3s;
-}
-
-.feature-card:hover {
-  transform: translateY(-5px);
-}
-
-.icon-circle {
-  width: 70px;
-  height: 70px;
-  background-color: #e3f2fd;
-  color: #007bff;
-  border-radius: 50%;
+  padding: 4rem 2rem;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.8rem;
-  margin: 0 auto 1.5rem auto;
+  min-height: 80vh; 
 }
 
-.feature-card h3 {
-  color: #333;
-  margin-bottom: 1rem;
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; 
+  gap: 4rem;
+  align-items: center;
+  width: 100%;
 }
 
-.feature-card p {
+.text-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start; 
+}
+
+.pre-title {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #999;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+h1 {
+  font-size: 3rem;
+  color: var(--text-dark); 
+  margin: 0;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+.separator {
+  width: 60px;
+  height: 4px;
+  background-color: var(--primary); 
+  margin: 1rem 0 2rem 0;
+  border-radius: 2px;
+}
+
+p {
   color: #666;
+  font-size: 1.1rem;
   line-height: 1.6;
-}
-
-.about-project-section {
-  background-color: #f8f9fa;
-  padding: 4rem 1rem;
-}
-
-.content-box {
-  max-width: 800px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.content-box h2 {
-  color: #2c3e50;
   margin-bottom: 1.5rem;
 }
 
-.content-box p {
-  color: #555;
-  font-size: 1.1rem;
-  line-height: 1.8;
-  margin-bottom: 1rem;
+.btn-learn-more {
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  padding: 0.8rem 2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 50px; 
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 10px var(--primary-focus);
 }
 
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
+.btn-learn-more:hover {
+  background-color: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(5, 150, 105, 0.4);
+}
+
+.visual-content {
+  position: relative;
+  height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.blob-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: var(--primary-light);
+  border-radius: 46% 54% 39% 61% / 55% 36% 64% 45%; 
+  z-index: 1;
+}
+
+.illustration-placeholder {
+  position: relative;
+  z-index: 2; 
+  color: var(--primary);
+}
+
+.hero-icon {
+  font-size: 10rem;
+  filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));
+}
+
+/* --- RESPONSIVIDADE --- */
+@media (max-width: 768px) {
+  .about-grid {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 3rem;
+  }
+
+  .text-content {
+    align-items: center; 
+  }
+
+  .visual-content {
+    order: -1; 
+    height: 300px;
+  }
+  
+  .hero-icon {
+    font-size: 8rem;
+  }
 }
 </style>

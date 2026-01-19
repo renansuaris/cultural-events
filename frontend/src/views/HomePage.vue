@@ -29,9 +29,10 @@
       <button 
         :disabled="eventStore.page === 1" 
         @click="changePage(eventStore.page - 1)"
-        class="btn-page"
+        class="btn-page icon-only"
+        title="Página Anterior"
       >
-        &laquo; Anterior
+        <font-awesome-icon icon="chevron-left" />
       </button>
 
       <span class="page-info">
@@ -41,9 +42,10 @@
       <button 
         :disabled="eventStore.page === eventStore.totalPages" 
         @click="changePage(eventStore.page + 1)"
-        class="btn-page"
+        class="btn-page icon-only"
+        title="Próxima Página"
       >
-        Próximo &raquo;
+        <font-awesome-icon icon="chevron-right" />
       </button>
     </div>
   </main>
@@ -88,6 +90,9 @@ async function changePage(newPage: number) {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .page-header {
@@ -130,7 +135,7 @@ h1 {
   justify-content: center;
   align-items: center;
   gap: 1.5rem;
-  margin-top: 3rem;
+  margin-top: auto;
   padding-top: 1.5rem;
   border-top: 1px solid #eee;
 }
@@ -138,7 +143,7 @@ h1 {
 .btn-page {
   background-color: white;
   border: 1px solid #ddd;
-  padding: 0.6rem 1.2rem;
+  padding: 0.6rem 1rem;
   border-radius: 6px;
   cursor: pointer;
   font-weight: 600;
@@ -147,8 +152,8 @@ h1 {
 }
 
 .btn-page:hover:not(:disabled) {
-  border-color: #007bff;
-  color: #007bff;
+  border-color: var(--primary-light);
+  color: var(--primary);
   background-color: #f0f7ff;
 }
 

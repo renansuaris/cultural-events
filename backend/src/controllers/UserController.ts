@@ -2,49 +2,36 @@ import { Request, Response } from "express";
 import { UserService } from "../services/UserService";
 
 export class UserController {
+
+  constructor(private userService: UserService) {}
+
   async create(req: Request, res: Response) {
-    const { name, email, password } = req.body;
-    const userService = new UserService();
-    const user = await userService.create({ name, email, password });
+    const user = await this.userService.create(req.body);
     return res.status(201).json(user);
   }
 
   async update(req: Request, res: Response) {
     const { id } = req.params;
-    const { name, email, password } = req.body;
     const loggedUserId = req.userId;
-
-    const userService = new UserService();
-    const user = await userService.update(id, loggedUserId, {
-      name,
-      email,
-      password,
-    });
-
+    const user = await this.userService.update(id, loggedUserId, req.body);
     return res.json(user);
   }
 
   async delete(req: Request, res: Response) {
     const { id } = req.params;
     const { userId, userRole } = req;
-
-    const userService = new UserService();
-    await userService.delete(id, userId, userRole);
-
+    await this.userService.delete(id, userId, userRole);
     return res.status(204).send();
   }
 
   async me(req: Request, res: Response) {
-    const userService = new UserService();
-    const user = await userService.getProfile(req.userId);
+    const user = await this.userService.getProfile(req.userId);
     return res.json(user);
   }
 
   async index(req: Request, res: Response) {
-    const { userId, userRole } = req;
-
-    const userService = new UserService();
-    const users = await userService.listAll(userRole);
+    const { userRole } = req;
+    const users = await this.userService.listAll(userRole);
     return res.json(users);
   }
 
@@ -52,9 +39,7 @@ export class UserController {
     const { id } = req.params;
     const { role } = req.body;
     const { userId, userRole } = req;
-
-    const userService = new UserService();
-    await userService.updateRole(id, role, userId, userRole);
+    await this.userService.updateRole(id, role, userId, userRole);
     return res.json({ message: "Papel atualizado com sucesso" });
   }
 }

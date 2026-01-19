@@ -1,19 +1,14 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import api from '@/services/api'
-
-export interface ICategory {
-  id: string
-  name: string
-}
+import CategoryService from '@/services/CategoryService'
+import type { Category } from '@/types' 
 
 export const useCategoryStore = defineStore('category', () => {
-
-  const categories = ref<ICategory[]>([])
+  const categories = ref<Category[]>([])
 
   async function fetchAllCategories() {
     try {
-      const { data } = await api.get('/categories')
+      const data = await CategoryService.getAll()
       categories.value = data
     } catch (error) {
       console.error(error)
@@ -21,25 +16,13 @@ export const useCategoryStore = defineStore('category', () => {
   }
 
   async function createCategory(name: string) {
-    try {
-      await api.post('/categories', { name })
-      await fetchAllCategories()
-      return true
-    } catch (error) {
-      console.error(error)
-      return false
-    }
+    await CategoryService.create(name)
+    await fetchAllCategories()
   }
   
   async function deleteCategory(id: string) {
-    try {
-      await api.delete(`/categories/${id}`)
-      await fetchAllCategories()
-      return true
-    } catch (error) {
-      console.error(error)
-      return false
-    }
+    await CategoryService.delete(id)
+    await fetchAllCategories()
   }
   
   return { 

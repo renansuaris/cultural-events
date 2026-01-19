@@ -2,49 +2,37 @@ import { Request, Response } from 'express';
 import { EventService } from '../services/EventService';
 
 export class EventController {
+
+  constructor(private eventService: EventService) {}
   
   async create(req: Request, res: Response) {
-    const { title, date, location, description, categoryId } = req.body;
-    const { userId, userRole } = req;
-
-    const eventService = new EventService();
-    const newEvent = await eventService.create(
-      { title, date, location, description, categoryId }, userId);
-
+    const { userId } = req;
+    const newEvent = await this.eventService.create(req.body, userId);
     return res.status(201).json(newEvent);
   }
 
   async list(req: Request, res: Response) {
-    const eventService = new EventService();
-    const result = await eventService.list(req.query);
+    const result = await this.eventService.list(req.query);
     return res.json(result);
   }
 
   async update(req: Request, res: Response) {
     const { id } = req.params;
     const userId = req.userId;
-    const { title, date, location, description, categoryId } = req.body;
-
-    const eventService = new EventService();
-    const event = await eventService.update(id, { title, date, location, description, categoryId }, userId, req.userRole);
-
+    const event = await this.eventService.update(id, req.body, userId, req.userRole);
     return res.json(event);
   }
 
   async delete(req: Request, res: Response) {
     const { id } = req.params;
     const { userId, userRole } = req;
-
-    const eventService = new EventService();
-    await eventService.delete(id, userId, userRole);
-
+    await this.eventService.delete(id, userId, userRole);
     return res.status(204).send();
   }
 
   async show(req: Request, res: Response) {
     const { id } = req.params;
-    const eventService = new EventService();
-    const event = await eventService.show(id);
+    const event = await this.eventService.show(id);
     return res.json(event);
   }
 }

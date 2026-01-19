@@ -27,10 +27,10 @@
 
 <script setup lang="ts">
 import EventCard from '@/components/EventCard.vue'
-import type { IEvent } from '@/stores/event.store'
+import type { Event } from '@/types'
 
 defineProps<{
-  events: IEvent[]
+  events: Event[]
   isLoading?: boolean
 }>()
 </script>

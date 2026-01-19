@@ -78,7 +78,7 @@ function handleLogout() {
 }
 
 .color {
-  color: #007bff;
+  color: var(--primary); 
 }
 
 .main-nav a {
@@ -88,8 +88,9 @@ function handleLogout() {
   cursor: pointer;
   transition: color 0.2s ease;
 }
+
 .main-nav a:hover {
-  color: #007bff;
+  color: var(--primary); 
 }
 .main-nav a[href="#"] {
   color: #dc3545;

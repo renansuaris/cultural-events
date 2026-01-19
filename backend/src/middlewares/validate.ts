@@ -1,13 +1,29 @@
 import { NextFunction, Request, Response } from 'express';
-import { AnyZodObject, ZodError } from 'zod';
+import { ZodObject, ZodError } from 'zod';
 
-export const validate = (schema: AnyZodObject) => async (req: Request, res: Response, next: NextFunction) => {
+export const validate = (schema: ZodObject<any>) => async (req: Request, res: Response, next: NextFunction) => {
   try {
-    await schema.parseAsync({
+
+    const result = await schema.parseAsync({
       body: req.body,
       query: req.query,
       params: req.params,
     });
+
+    req.body = result.body;
+
+    Object.defineProperty(req, 'query', {
+      value: result.query,
+      writable: true,
+      configurable: true
+    });
+
+    Object.defineProperty(req, 'params', {
+      value: result.params,
+      writable: true,
+      configurable: true
+    });
+
     return next();
   } catch (error) {
     console.error("Erro de Validação Zod:", error);

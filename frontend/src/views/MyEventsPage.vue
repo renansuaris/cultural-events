@@ -51,9 +51,11 @@
 import { onMounted } from 'vue'
 import { RouterLink } from 'vue-router'
 import { useEventStore } from '@/stores/event.store'
+import { useToast } from 'vue-toastification'
 import { formatDate } from '@/utils/formatDate'
 
 const eventStore = useEventStore()
+const toast = useToast()
 
 onMounted(() => {
   eventStore.fetchMyEvents()
@@ -61,11 +63,11 @@ onMounted(() => {
 
 async function handleDelete(id: string) {
   if (confirm('Tem certeza que deseja deletar este evento?')) {
-    
-    const success = await eventStore.deleteEvent(id)
-    
-    if (!success) {
-      alert('Ocorreu um erro ao tentar deletar o evento.')
+    try {
+      await eventStore.deleteEvent(id)
+      toast.success('Evento deletado com sucesso!')
+    } catch (error) {
+      toast.error('Ocorreu um erro ao tentar deletar o evento.')
     }
   }
 }
@@ -188,7 +190,7 @@ async function handleDelete(id: string) {
 
 .btn-primary {
   display: inline-block;
-  background-color: #007bff;
+  background-color: var(--primary);
   color: white;
   padding: 0.75rem 1.5rem;
   border-radius: 6px;
@@ -198,7 +200,7 @@ async function handleDelete(id: string) {
 }
 
 .btn-primary:hover {
-  background-color: #0056b3;
+  background-color: var(--primary-hover);
 }
 
 </style>

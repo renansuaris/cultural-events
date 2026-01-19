@@ -1,15 +1,15 @@
-import { AppDataSource } from '../config/data-source';
+import { Repository } from 'typeorm/repository/Repository';
 import { Category } from '../entities/Category';
 import { ConflictError, ForbiddenError, NotFoundError } from '../errors/AppErrors';
+import { UserRoles } from '../constants/roles';
 
 export class CategoryService {
-  private categoryRepository = AppDataSource.getRepository(Category);
+  constructor(private categoryRepository: Repository<Category>) {}
 
-  async create(name: string, userId: string, userRole: string) {
-    if (userRole !== 'admin') {
+  async create(name: string, userId: string, userRole: UserRoles) {
+    if (userRole !== UserRoles.ADMIN) {
       throw new ForbiddenError('Apenas administradores podem criar categorias');
     }
-
     const categoryExists = await this.categoryRepository.findOneBy({ name });
     if (categoryExists) {
       throw new ConflictError('Categoria já existe');
@@ -25,8 +25,8 @@ export class CategoryService {
     return await this.categoryRepository.find();
   }
 
-  async delete(id: string, userId: string, userRole: string) {
-    if (userRole !== 'admin') {
+  async delete(id: string, userId: string, userRole: UserRoles) {
+    if (userRole !== UserRoles.ADMIN) {
       throw new ForbiddenError('Apenas administradores podem deletar categorias');
     }
 

@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import 'reflect-metadata';
-import 'express-async-errors';
 import express from 'express';
 import cors from 'cors';
 import { AppDataSource } from './config/data-source';
@@ -10,7 +9,7 @@ import { generateOpenAPI } from './config/openapi';
 import { errorMiddleware } from './middlewares/errorMiddleware';
 
 const app = express();
-const PORT = 3000;
+const PORT = Number(process.env.port) || 3000;
 
 app.use(cors()); 
 app.use(express.json());
@@ -25,7 +24,4 @@ AppDataSource.initialize()
     app.listen(PORT, () => {
       console.log(`Servidor rodando na porta ${PORT}`);
     });
-  })
-  .catch((error) => {
-    console.error('Erro ao conectar no banco:', error);
   });

@@ -1,61 +1,33 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useAuthStore } from './auth'
-import { type ICategory } from './category.store'
-import api from '@/services/api'
-
-export interface IEvent {
-  id: string
-  title: string
-  date: string
-  location: string
-  description: string
-  userId: string 
-  categoryId: string
-  category?: ICategory
-}
-
-type CreateEventData = {
-  title: string
-  date: string
-  location: string
-  description: string
-  categoryId: string
-}
-
-type UpdateEventData = {
-  title: string
-  date: string
-  location: string
-  description: string
-  categoryId?: string
-}
+import EventService from '@/services/EventService'
+import type { Event, CreateEventDTO, UpdateEventDTO } from '@/types'
 
 export const useEventStore = defineStore('event', () => {
   
-  const events = ref<IEvent[]>([])
-  const currentEvent = ref<IEvent | null>(null)
-  const myEvents = ref<IEvent[]>([])
+  const events = ref<Event[]>([])
+  const currentEvent = ref<Event | null>(null)
+  const myEvents = ref<Event[]>([])
 
   const page = ref(1)
   const totalPages = ref(1)
 
-  async function fetchAllEvents(categoryId?: string, pageNumber = 1) {
+  async function fetchAllEvents(categoryId?: string, pageNumber = 1, limit = 6) {
     try {
       const params = new URLSearchParams()
       params.append('page', pageNumber.toString())
-      params.append('limit', '6') 
-      
+      params.append('limit', limit.toString()) 
+        
       if (categoryId) {
         params.append('categoryId', categoryId)
       }
 
-      const { data } = await api.get(`/events?${params.toString()}`)
-      
+      const data = await EventService.getAll(params)
+        
       events.value = data.data
       page.value = data.page
       totalPages.value = data.lastPage
-
     } catch (error) {
       console.error(error)
     }
@@ -64,22 +36,18 @@ export const useEventStore = defineStore('event', () => {
   async function fetchEventById(id: string) {
     currentEvent.value = null 
     try {
-      const { data } = await api.get(`/events/${id}`)
+      const data = await EventService.getById(id)
       currentEvent.value = data
     } catch (error) {
       console.error(error)
     }
   }
 
-  async function createEvent(eventData: CreateEventData) {
-    try {
-      await api.post('/events', eventData)
-      await fetchAllEvents()
-      return true
-    } catch (error) {
-      console.error(error)
-      return false
-    }
+  async function createEvent(eventData: CreateEventDTO) {
+    await EventService.create(eventData)
+    await fetchAllEvents()
+    
+    return true
   }
 
   async function fetchMyEvents() {
@@ -88,35 +56,20 @@ export const useEventStore = defineStore('event', () => {
 
     if (!currentUserId) return 
 
-    try {
-      const { data } = await api.get(`/events?userId=${currentUserId}&limit=100`)
-      myEvents.value = data.data
-      
-    } catch (error) {
-      console.error(error)
-    }
+    const { data } = await EventService.getAll(new URLSearchParams(`userId=${currentUserId}&limit=100`))
+    myEvents.value = data
   }
 
-  async function updateEvent(id: string, eventData: UpdateEventData) {
-    try {
-      await api.put(`/events/${id}`, eventData)
-      await fetchMyEvents() 
-      return true 
-    } catch (error) {
-      console.error(error)
-      return false 
-    }
+  async function updateEvent(id: string, eventData: UpdateEventDTO) {
+    await EventService.update(id, eventData)
+    await fetchMyEvents() 
   }
 
   async function deleteEvent(id: string) {
-    try {
-      await api.delete(`/events/${id}`)
-      await fetchMyEvents() 
-      return true 
-    } catch (error) {
-      console.error(error)
-      return false 
-    }
+    await EventService.delete(id)
+    events.value = events.value.filter(e => e.id !== id)
+    myEvents.value = myEvents.value.filter(e => e.id !== id)
+    await fetchMyEvents() 
   }
 
   return { 

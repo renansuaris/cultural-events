@@ -7,28 +7,28 @@
       <form @submit.prevent="handleSubmit">
         <div class="form-group">
           <label for="name">Nome Completo:</label>
-          <input type="text" id="name" v-model="name" />
-          <p v-if="errors.name" class="error">{{ errors.name }}</p>
+          <input type="text" id="name" v-model="name" :class="{ 'is-invalid': errors.name }" />
+          <span v-if="errors.name" class="error">{{ errors.name }}</span>
         </div>
         <div class="form-group">
           <label for="email">Email:</label>
-          <input type="email" id="email" v-model="email" />
-          <p v-if="errors.email" class="error">{{ errors.email }}</p>
+          <input type="email" id="email" v-model="email" :class="{ 'is-invalid': errors.email }" />
+          <span v-if="errors.email" class="error">{{ errors.email }}</span>
         </div>
         <div class="form-group">
           <label for="password">Senha:</label>
-          <input type="password" id="password" v-model="password" />
-          <p v-if="errors.password" class="error">{{ errors.password }}</p>
+          <input type="password" id="password" v-model="password" :class="{ 'is-invalid': errors.password }"/>
+          <span v-if="errors.password" class="error">{{ errors.password }}</span>
         </div>
         <div class="form-group">
           <label for="password-confirm">Confirme sua Senha:</label>
-          <input type="password" id="password-confirm" v-model="passwordConfirm" />
-          <p v-if="errors.passwordConfirm" class="error">{{ errors.passwordConfirm }}</p>
+          <input type="password" id="password-confirm" v-model="passwordConfirm" :class="{ 'is-invalid': errors.password }" />
+          <span v-if="errors.password" class="error">{{ errors.password }}</span>
         </div>
 
-        <p v-if="errors.api" class="error">{{ errors.api }}</p>
-
-        <button type="submit" class="btn-submit">Registrar</button>
+        <button type="submit" class="btn-submit" :disabled="isLoading">
+          {{ isLoading ? 'Registrando...' : 'Registrar' }}
+        </button>
       </form>
 
       <div class="login-link">
@@ -43,72 +43,47 @@
 
 <script setup lang="ts">
 
-import { ref, reactive } from 'vue'
+import { ref } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useToast } from 'vue-toastification'
 import { useRouter, RouterLink } from 'vue-router' 
+import { useFormHandler } from '@/composables/useFormHandler'
 
 const name = ref('')
 const email = ref('')
 const password = ref('')
 const passwordConfirm = ref('')
 
-const errors = reactive({
-  name: '',
-  email: '',
-  password: '',
-  passwordConfirm: '',
-  api: ''
-})
-
+const { isLoading, errors, execute } = useFormHandler()
 const authStore = useAuthStore()
 const router = useRouter()
-
-function validateForm() {
-  errors.name = ''
-  errors.email = ''
-  errors.password = ''
-  errors.passwordConfirm = ''
-  errors.api = ''
-  
-  let isValid = true
-  if (!name.value) {
-    errors.name = 'O nome é obrigatório.'
-    isValid = false
-  }
-  if (!email.value) {
-    errors.email = 'O email é obrigatório.'
-    isValid = false
-  }
-  if (password.value.length < 6) { 
-    errors.password = 'A senha deve ter pelo menos 6 caracteres.'
-    isValid = false
-  }
-  if (password.value !== passwordConfirm.value) {
-    errors.passwordConfirm = 'As senhas não coincidem.'
-    isValid = false
-  }
-  return isValid
-}
+const toast = useToast()
 
 async function handleSubmit() {
-  if (!validateForm()) {
-    return 
+  if (password.value !== passwordConfirm.value) {
+    toast.warning("As senhas não coincidem!");
+    return;
   }
-  const result = await authStore.register({
-    name: name.value,
-    email: email.value,
-    password: password.value
-  })
-  if (result.success) {
-    alert('Conta criada com sucesso! Por favor, faça login para continuar.')
-    router.push({ name: 'login' })
-  } else {
-    errors.api = result.error || 'Ocorreu um erro desconhecido.'
-  }
+  
+  await execute(
+    () => authStore.register({
+      name: name.value,
+      email: email.value,
+      password: password.value
+    }),
+    () => {
+      toast.success('Conta criada! Faça login.')
+      router.push({ name: 'login' })
+    }
+  )
 }
 </script>
 
 <style scoped>
+
+.is-invalid {
+   border-color: #dc3545 !important; 
+  }
 
 .form-page-container {
   display: flex;
@@ -164,7 +139,7 @@ p {
 
 .form-group input:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: var(--primary);
   box-shadow: 0 0 0 2px rgba(0,123,255,0.2);
 }
 
@@ -174,7 +149,7 @@ p {
   font-size: 1.1rem;
   font-weight: 700;
   color: white;
-  background-color: #007bff;
+  background-color: var(--primary);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -182,7 +157,7 @@ p {
 }
 
 .btn-submit:hover {
-  background-color: #0056b3;
+  background-color: var(--primary-hover);
 }
 
 .login-link {
@@ -192,7 +167,7 @@ p {
   font-size: 0.9rem;
 }
 .login-link a {
-  color: #007bff;
+  color: var(--primary);
   font-weight: 700;
   text-decoration: none;
 }

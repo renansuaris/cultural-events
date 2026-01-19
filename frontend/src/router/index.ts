@@ -13,6 +13,7 @@ import AdminManageEventsPage from '../views/AdminManageEventsPage.vue'
 import AdminManageUsersPage from '../views/AdminManageUsersPage.vue'
 import AdminManageCategoriesPage from '../views/AdminManageCategoriesPage.vue'
 import MyEventsPage from '@/views/MyEventsPage.vue'
+import NotFoundPage from '../views/NotFoundPage.vue'
 
 type UserRole = 'admin' | 'user' | null
 
@@ -96,6 +97,12 @@ const router = createRouter({
       component: AdminDashboardPage,
       meta: { requiresAuth: true, role: 'admin' },
     },
+
+    {
+      path: '/:pathMatch(.*)*', 
+      name: 'not-found',
+      component: NotFoundPage
+    }
   ],
 })
 

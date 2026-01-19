@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { verify } from 'jsonwebtoken';
 import { UnauthorizedError } from '../errors/AppErrors';
+import { UserRoles } from '../constants/roles';
 
 type TokenPayload = {
   id: string;
-  role: string;
+  role: UserRoles;
   iat: number;
   exp: number;
 };
@@ -31,7 +32,7 @@ export async function authMiddleware(
     req.userRole = role;
 
     return next();
-  } catch (error) {
+  } catch (error) {   
     throw new UnauthorizedError('Token inválido ou expirado');
   }
 }

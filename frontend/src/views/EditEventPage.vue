@@ -7,6 +7,7 @@
         buttonText="Salvar Alterações"
         :isLoading="isLoading"
         :initialData="eventData"
+        :serverErrors="errors"
         @submit="handleUpdate"
       />
     </div>
@@ -18,15 +19,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useEventStore } from '@/stores/event.store'
+import { useToast } from 'vue-toastification'
 import EventForm from '@/components/EventForm.vue'
+import { useFormHandler } from '@/composables/useFormHandler'
 
 const eventStore = useEventStore()
 const route = useRoute()
 const router = useRouter()
-const isLoading = ref(false)
+const toast = useToast()
+
+const { isLoading, errors, execute } = useFormHandler()
 
 const eventData = computed(() => {
   const evt = eventStore.currentEvent
@@ -47,18 +52,14 @@ onMounted(async () => {
 })
 
 async function handleUpdate(formData: any) {
-  isLoading.value = true
-  const eventId = route.params.id as string
-  
-  const success = await eventStore.updateEvent(eventId, formData)
-  
-  if (success) {
-    alert('Evento atualizado com sucesso!')
-    router.push({ name: 'event-details', params: { id: eventId } })
-  } else {
-    alert('Erro ao atualizar evento.')
-  }
-  isLoading.value = false
+  const eventId = route.params.id as string;
+  await execute(
+    () => eventStore.updateEvent(eventId, formData),
+    () => {
+      toast.success("Evento atualizado com sucesso!");
+      router.push({ name: 'event-details', params: { id: eventId } });
+    }
+  );
 }
 </script>
 

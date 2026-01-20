@@ -10,7 +10,7 @@
           v-model="formData.title" 
           class="form-control"
           :class="{ 'is-invalid': serverErrors?.title }"
-          placeholder="Ex: Show de Rock na praã do leão"
+          placeholder="Ex: Show de Rock na praca do leão"
         />
         <span v-if="serverErrors?.title" class="error">{{ serverErrors.title }}</span>
       </div>
@@ -170,7 +170,7 @@ label {
 .btn-submit {
   width: 100%;
   padding: 1rem;
-  background-color: var(--primary-light);
+  background-color: var(--primary);
   color: white;
   border: none;
   border-radius: 4px;
@@ -181,7 +181,7 @@ label {
 }
 
 .btn-submit:hover {
-  background-color: #218838;
+  background-color: var(--primary-hover);
 }
 
 .btn-submit:disabled {

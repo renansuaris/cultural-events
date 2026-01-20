@@ -4,7 +4,7 @@
     <p class="subtitle">Bem vindo, Admin. Selecione uma área para gerenciar:</p>
 
     <div class="dashboard-grid">
-      <RouterLink :to="{ name: 'admin-events' }" class="dashboard-card">
+      <RouterLink :to="{ name: Routes.ADMIN_EVENTS }" class="dashboard-card">
         <div class="card-icon">
           <font-awesome-icon icon="calendar-days" />
         </div>
@@ -12,7 +12,7 @@
         <p>Visualize, edite ou remova qualquer evento da plataforma.</p>
       </RouterLink>
 
-      <RouterLink :to="{ name: 'admin-users' }" class="dashboard-card">
+      <RouterLink :to="{ name: Routes.ADMIN_USERS }" class="dashboard-card">
         <div class="card-icon">
           <font-awesome-icon icon="users" />
         </div>
@@ -20,7 +20,7 @@
         <p>Veja os usuários cadastrados e gerencie permissões.</p>
       </RouterLink>
 
-      <RouterLink :to="{ name: 'admin-categories' }" class="dashboard-card">
+      <RouterLink :to="{ name: Routes.ADMIN_CATEGORIES }" class="dashboard-card">
         <div class="card-icon">
           <font-awesome-icon icon="tags" />
         </div>
@@ -33,6 +33,7 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import { Routes } from '@/constants/routeNames';
 </script>
 
 <style scoped>

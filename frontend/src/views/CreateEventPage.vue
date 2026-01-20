@@ -18,6 +18,7 @@ import { useEventStore } from '@/stores/event.store'
 import EventForm from '@/components/EventForm.vue' 
 import { useToast } from "vue-toastification";
 import { useFormHandler } from '@/composables/useFormHandler';
+import type { CreateEventDTO } from '@/types';
 
 const eventStore = useEventStore()
 const router = useRouter()
@@ -25,7 +26,7 @@ const toast = useToast()
 
 const { isLoading, errors, execute } = useFormHandler();
 
-async function handleCreate(formData: any) {
+async function handleCreate(formData: CreateEventDTO) {
   await execute(
     () => eventStore.createEvent(formData),
     () => {

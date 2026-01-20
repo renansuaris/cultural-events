@@ -8,12 +8,22 @@
         <div class="separator"></div>
         
         <p>
-          O <strong>Cultural Events</strong> nasceu de um desejo simples: conectar pessoas a experiências inesquecíveis. 
-          Somos um projeto acadêmico focado em facilitar o acesso à cultura, permitindo que produtores locais divulguem seu trabalho e que o público descubra o que há de melhor na cidade.
+          O <strong>Cultural Events</strong> nasceu de algo simples e muito humano: a vontade de ver a cultura mais perto das pessoas.
+          Somos um projeto acadêmico criado para conectar quem produz arte com quem quer viver novas experiências.
         </p>
         
         <p>
-          Acreditamos que a cultura deve ser acessível, vibrante e comunitária. Seja um show de rock, uma peça de teatro ou um workshop de arte, seu lugar é aqui.
+          Aqui, produtores locais ganham espaço para divulgar seu trabalho e o público descobre shows, peças, oficinas e eventos
+          que muitas vezes passam despercebidos na correria do dia a dia.
+        </p>
+
+        <p>
+          Acreditamos que cultura é encontro, é troca e é pertencimento. Seja um show de rock, uma peça de teatro ou um workshop de arte,
+          sempre existe um evento esperando por você.
+        </p>
+
+        <p>
+          Isso é <strong>Cultural Events.</strong> 
         </p>
 
         <button class="btn-learn-more">
@@ -24,7 +34,11 @@
       <div class="visual-content">
         <div class="blob-bg"></div>
         <div class="illustration-placeholder">
-          <font-awesome-icon icon="users" class="hero-icon" />
+          <img 
+            src="/cultural-events-icon.png" 
+            alt="Logo Cultural Events" 
+            class="about-logo"
+          />
         </div>
       </div>
 
@@ -33,7 +47,6 @@
 </template>
 
 <script setup lang="ts">
-
 </script>
 
 <style scoped>
@@ -133,33 +146,16 @@ p {
 .illustration-placeholder {
   position: relative;
   z-index: 2; 
-  color: var(--primary);
 }
 
-.hero-icon {
-  font-size: 10rem;
-  filter: drop-shadow(0 10px 10px rgba(0,0,0,0.1));
+.about-logo {
+  width: 380px; /* Aumentado de 200px para 380px */
+  height: auto;
+  filter: drop-shadow(0 15px 15px rgba(0,0,0,0.15)); /* Sombra um pouco mais forte pra destacar */
+  transition: transform 0.3s ease;
 }
 
-/* --- RESPONSIVIDADE --- */
-@media (max-width: 768px) {
-  .about-grid {
-    grid-template-columns: 1fr;
-    text-align: center;
-    gap: 3rem;
-  }
-
-  .text-content {
-    align-items: center; 
-  }
-
-  .visual-content {
-    order: -1; 
-    height: 300px;
-  }
-  
-  .hero-icon {
-    font-size: 8rem;
-  }
+.about-logo:hover {
+  transform: scale(1.05) rotate(-5deg); 
 }
 </style>

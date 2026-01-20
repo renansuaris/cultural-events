@@ -3,7 +3,7 @@
     <h1>404</h1>
     <p>Página não encontrada.</p>
 
-    <RouterLink to="/" class="link">
+    <RouterLink :to="{ name: Routes.HOME }" class="link">
       Voltar para a página inicial
     </RouterLink>
   </main>
@@ -11,6 +11,7 @@
 
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
+import { Routes } from '@/constants/routeNames';
 </script>
 
 <style scoped>

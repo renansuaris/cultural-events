@@ -19,7 +19,7 @@
       </div>
 
       <div class="card-footer">
-        <RouterLink class="btn-details" :to="{ name: 'event-details', params: { id: id } }">
+        <RouterLink class="btn-details" :to="{ name: Routes.EVENT_DETAILS, params: { id: id } }">
           Ver Detalhes
         </RouterLink>
       </div>
@@ -30,6 +30,7 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 import { formatDate } from '@/utils/formatDate'
+import { Routes } from '@/constants/routeNames';
 
 defineProps<{
   id: string

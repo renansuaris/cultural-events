@@ -2,10 +2,10 @@
   <footer class="simple-footer">
     <div class="content">
       <div class="footer-flex">
-        <p>&copy; Cultural Events</p>
+        <p>Cultural Events</p>
         
         <div class="footer-links">
-          <RouterLink :to="{ name: 'about' }">Sobre</RouterLink>
+          <RouterLink :to="{ name: Routes.ABOUT }">Sobre</RouterLink>
         </div>
       </div>
     </div>
@@ -15,6 +15,7 @@
 <script setup lang="ts">
   
 import { RouterLink } from 'vue-router'
+import { Routes } from '@/constants/routeNames';
 
 </script>
 

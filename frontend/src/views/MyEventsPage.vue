@@ -21,7 +21,7 @@
         
         <div class="event-actions">
           <RouterLink 
-            :to="{ name: 'edit-event', params: { id: event.id } }" 
+            :to="{ name: Routes.EDIT_EVENT, params: { id: event.id } }" 
             class="btn-action edit"
           >
             Editar
@@ -40,7 +40,7 @@
     <div v-else class="empty-state">
       <h3>Você ainda não criou nenhum evento.</h3>
       <br>
-      <RouterLink :to="{ name: 'create-event' }" class="btn-primary">
+      <RouterLink :to="{ name: Routes.CREATE_EVENT }" class="btn-primary">
         <font-awesome-icon icon="plus" /> Criar Evento
       </RouterLink>
     </div>
@@ -53,6 +53,7 @@ import { RouterLink } from 'vue-router'
 import { useEventStore } from '@/stores/event.store'
 import { useToast } from 'vue-toastification'
 import { formatDate } from '@/utils/formatDate'
+import { Routes } from '@/constants/routeNames'
 
 const eventStore = useEventStore()
 const toast = useToast()

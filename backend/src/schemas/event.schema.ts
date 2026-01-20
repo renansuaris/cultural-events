@@ -28,6 +28,7 @@ export const eventQuerySchema = z.object({
   limit: z.coerce.number().min(1).max(100).default(6),
   categoryId: z.string().uuid().optional(),
   userId: z.string().uuid().optional(), 
+  title: z.string().optional()
 });
 
 export const listEventsSchema = z.object({

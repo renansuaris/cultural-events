@@ -25,6 +25,7 @@ import { useEventStore } from '@/stores/event.store'
 import { useToast } from 'vue-toastification'
 import EventForm from '@/components/EventForm.vue'
 import { useFormHandler } from '@/composables/useFormHandler'
+import type { UpdateEventDTO } from '@/types'
 
 const eventStore = useEventStore()
 const route = useRoute()
@@ -51,7 +52,7 @@ onMounted(async () => {
   await eventStore.fetchEventById(eventId)
 })
 
-async function handleUpdate(formData: any) {
+async function handleUpdate(formData: UpdateEventDTO) {
   const eventId = route.params.id as string;
   await execute(
     () => eventStore.updateEvent(eventId, formData),

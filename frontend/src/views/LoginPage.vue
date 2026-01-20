@@ -32,7 +32,7 @@
       </form>
 
       <div class="register-link">
-        <p> Não tem cadastro ainda? <RouterLink :to="{ name: 'register' }">Cadastre-se</RouterLink></p>
+        <p> Não tem cadastro ainda? <RouterLink :to="{ name: Routes.REGISTER }">Cadastre-se</RouterLink></p>
       </div>
     </div>
   </main>
@@ -45,6 +45,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useRouter, RouterLink } from 'vue-router'
 import { useFormHandler } from '@/composables/useFormHandler'
 import { useToast } from 'vue-toastification'
+import { Routes } from '@/constants/routeNames'
 
 const email = ref('')
 const password = ref('')
@@ -65,9 +66,9 @@ async function handleSubmit() {
       toast.success(`Bem-vindo de volta, ${user.name}`)
 
       if (user.role === 'admin') {
-        router.push({ name: 'admin-dashboard' })
+        router.push({ name: Routes.ADMIN_DASHBOARD })
       } else {
-        router.push({ name: 'home' })
+        router.push({ name: Routes.HOME })
       }
     }
   )

@@ -13,7 +13,7 @@ export const useEventStore = defineStore('event', () => {
   const page = ref(1)
   const totalPages = ref(1)
 
-  async function fetchAllEvents(categoryId?: string, pageNumber = 1, limit = 6) {
+  async function fetchAllEvents(categoryId?: string, pageNumber = 1, limit = 6, search?: string) {
     try {
       const params = new URLSearchParams()
       params.append('page', pageNumber.toString())
@@ -21,6 +21,10 @@ export const useEventStore = defineStore('event', () => {
         
       if (categoryId) {
         params.append('categoryId', categoryId)
+      }
+
+      if (search) {
+        params.append('title', search)
       }
 
       const data = await EventService.getAll(params)

@@ -23,16 +23,14 @@ onMounted(() => {
 </template>
 <style>
 
-/*@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap'); */
-
-@import url('https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
 :root {
-  --primary: #059669;       
-  --primary-hover: #047857; 
-  --primary-light: #d1fae5; 
-  --primary-focus: rgba(5, 150, 105, 0.2); 
-  --text-dark: #2c3e50;
+  --primary: #F05537;     
+  --primary-hover: #9b301b; 
+  --primary-light: #FFF0ED; 
+  --primary-focus: rgba(240, 85, 55, 0.2); 
+  --text-dark: #2c3e50;    
 }
 
 .text-primary { 
@@ -44,7 +42,8 @@ onMounted(() => {
 }
 
 html, body, #app {
-  font-family: 'PT Sans', sans-serif;  
+  font-family: 'Inter', sans-serif;
+  color: var(--text-dark); 
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

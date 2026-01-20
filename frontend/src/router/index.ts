@@ -14,6 +14,7 @@ import AdminManageUsersPage from '../views/AdminManageUsersPage.vue'
 import AdminManageCategoriesPage from '../views/AdminManageCategoriesPage.vue'
 import MyEventsPage from '@/views/MyEventsPage.vue'
 import NotFoundPage from '../views/NotFoundPage.vue'
+import { Routes } from '@/constants/routeNames'
 
 type UserRole = 'admin' | 'user' | null
 
@@ -23,84 +24,84 @@ const router = createRouter({
     // --- ROTAS PUBLICAS ---
     {
       path: '/',
-      name: 'home',
+      name: Routes.HOME,
       component: HomePage,
     },
     {
       path: '/evento/:id', 
-      name: 'event-details',
+      name: Routes.EVENT_DETAILS,
       component: EventDetailsPage,
     },
     {
       path: '/login',
-      name: 'login',
+      name: Routes.LOGIN,
       component: LoginPage,
     },
     {
       path: '/cadastro',
-      name: 'register',
+      name: Routes.REGISTER,
       component: RegisterPage,
     },
     {
       path: '/sobre',
-      name: 'about',
+      name: Routes.ABOUT,
       component: AboutPage,
     },
     // --- ROTAS DE USUARIO LOGADO ---
     {
       path: '/criar-evento',
-      name: 'create-event',
+      name: Routes.CREATE_EVENT,
       component: CreateEventPage,
       meta: { requiresAuth: true },
     },
     {
       path: '/evento/:id/editar', 
-      name: 'edit-event',
+      name: Routes.EDIT_EVENT,
       component: EditEventPage,
       meta: { requiresAuth: true }, 
     },
     {
       path: '/perfil',
-      name: 'profile',
+      name: Routes.PROFILE,
       component: ProfilePage,
       meta: { requiresAuth: true }, 
     },
     {
       path: '/meus-eventos',
-      name: 'my-events',
+      name: Routes.MY_EVENTS,
       component: MyEventsPage,
       meta: { requiresAuth: true } 
     },
     // --- ROTAS DE ADMINISTRADOR ---
     {
       path: '/admin/eventos',
-      name: 'admin-events',
+      name: Routes.ADMIN_EVENTS,
       component: AdminManageEventsPage,
       meta: { requiresAuth: true, role: 'admin' },
     },
     {
       path: '/admin/usuarios',
-      name: 'admin-users',
+      name: Routes.ADMIN_USERS,
       component: AdminManageUsersPage,
       meta: { requiresAuth: true, role: 'admin' },
     },
     {
       path: '/admin/categorias',
-      name: 'admin-categories',
+      name: Routes.ADMIN_CATEGORIES,
       component: AdminManageCategoriesPage,
       meta: { requiresAuth: true, role: 'admin' },
     },
 
     {
       path: '/admin',
-      name: 'admin-dashboard',
+      name: Routes.ADMIN_DASHBOARD,
       component: AdminDashboardPage,
       meta: { requiresAuth: true, role: 'admin' },
     },
 
     {
       path: '/:pathMatch(.*)*', 
-      name: 'not-found',
+      name: Routes.NOT_FOUND,
       component: NotFoundPage
     }
   ],
@@ -112,9 +113,9 @@ router.beforeEach((to, from, next) => {
   const requiredRole = to.meta.role as UserRole 
 
   if (requiresAuth && !auth.isLoggedIn) {
-    next({ name: 'login' }) 
+    next({ name: Routes.LOGIN }) 
   } else if (requiredRole && auth.userRole !== requiredRole) {
-    next({ name: 'home' }) 
+    next({ name: Routes.HOME }) 
   } else {
     next()
   }

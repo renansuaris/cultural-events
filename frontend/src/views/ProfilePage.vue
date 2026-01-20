@@ -47,9 +47,6 @@
           <input type="password" id="confirmPassword" v-model="confirmPassword" :class="{ 'is-invalid': errors.confirmPassword }" />
         </div>
 
-        <p v-if="error" class="error">{{ error }}</p>
-        <p v-if="successMsg" class="success">{{ successMsg }}</p>
-
         <button type="submit" class="btn-submit">Salvar Alterações</button>
       </form>
     </div>
@@ -62,6 +59,7 @@ import { useAuthStore } from '@/stores/auth'
 import AuthService from '@/services/AuthService'
 import { useFormHandler } from '@/composables/useFormHandler'
 import { useToast } from 'vue-toastification'
+import type { UpdateProfileDTO } from '@/types'
 
 const authStore = useAuthStore()
 const toast = useToast()
@@ -94,7 +92,7 @@ async function handleUpdate() {
     }
   }
 
-  const updateData: any = {
+  const updateData: UpdateProfileDTO = {
     name: name.value,
     email: email.value
   }
@@ -214,19 +212,6 @@ p {
   color: #888;
   margin-bottom: 1rem;
   font-style: italic;
-}
-
-.error {
-  color: #dc3545;
-  font-size: 0.9rem;
-  text-align: center;
-}
-
-.success {
-  color: #28a745;
-  font-size: 0.9rem;
-  text-align: center;
-  font-weight: bold;
 }
 
 .loading {

@@ -9,11 +9,11 @@
       <hr />
       <p class="event-description">{{ eventStore.currentEvent.description }}</p>
 
-      <RouterLink :to="{ name: 'home' }" class="back-link">&laquo; Voltar para a lista</RouterLink>
+      <RouterLink :to="{ name: Routes.HOME }" class="back-link">&laquo; Voltar para a lista</RouterLink>
     </div>
     <div v-else class="loading">
       <h2>Evento não encontrado ou carregando...</h2>
-      <RouterLink :to="{ name: 'home' }">&laquo; Voltar para a lista</RouterLink>
+      <RouterLink :to="{ name: Routes.HOME }">&laquo; Voltar para a lista</RouterLink>
     </div>
   </main>
 </template>
@@ -23,6 +23,7 @@ import { onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
 import { formatDate } from '@/utils/formatDate'
 import { useEventStore } from '@/stores/event.store'
+import { Routes } from '@/constants/routeNames'
 
 const eventStore = useEventStore()
 

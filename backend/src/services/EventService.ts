@@ -5,6 +5,7 @@ import { ForbiddenError, NotFoundError } from '../errors/AppErrors';
 import { createEventSchema, updateEventSchema, eventQuerySchema } from '../schemas/event.schema';
 import { Repository } from 'typeorm/repository/Repository';
 import { UserRoles } from '../constants/roles';
+import { ILike } from 'typeorm';
 
 type CreateEventDTO = z.infer<typeof createEventSchema>['body'];
 type UpdateEventDTO = z.infer<typeof updateEventSchema>['body'];
@@ -33,7 +34,7 @@ export class EventService {
   }
 
   async list(query: EventQueryDTO) {
-    const { categoryId, userId } = query; 
+    const { categoryId, userId, title } = query; 
     
     const page = Number(query.page) || 1;
     const limit = Number(query.limit) || 6;
@@ -43,6 +44,10 @@ export class EventService {
     const whereCondition: any = {};
     if (categoryId) whereCondition.categoryId = categoryId;
     if (userId) whereCondition.userId = userId;
+    
+    if (title) {
+      whereCondition.title = ILike(`%${title}%`);
+    }
 
     const [events, total] = await this.eventRepository.findAndCount({
       where: whereCondition,

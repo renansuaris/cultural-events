@@ -4,66 +4,93 @@
       <div>
         <h1>Gerenciar Eventos</h1>
       </div>
-      <RouterLink :to="{ name: 'admin-dashboard' }" class="back-link">
-        Voltar ao Painel</RouterLink>
+      <RouterLink :to="{ name: Routes.ADMIN_DASHBOARD }" class="back-link">
+        Voltar ao Painel
+      </RouterLink>
     </div>
 
     <div v-if="isLoading" class="loading-state">
       Carregando eventos...
     </div>
 
-    <div v-else-if="eventStore.events.length > 0" class="table-card">
-      <div class="table-responsive">
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Evento</th>
-              <th>Data</th>
-              <th>Categoria</th>
-              <th class="text-right">Ações</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="event in eventStore.events" :key="event.id">
-              <td>
-                <div class="event-cell">
-                  <strong>{{ event.title }}</strong>
-                  <small class="location-text">
-                    <font-awesome-icon icon="map-marker-alt" /> {{ event.location }}
-                  </small>
-                </div>
-              </td>
-              <td class="date-cell">
-                {{ formatDate(event.date) }}
-              </td>
-              <td>
-                <span class="badge">{{ event.category?.name || 'Sem Categoria' }}</span>
-              </td>
-              <td class="actions-cell">
-                <RouterLink 
-                  :to="{ name: 'edit-event', params: { id: event.id } }" 
-                  class="btn-action edit"
-                  title="Editar"
-                >
-                  <font-awesome-icon icon="pen-to-square" />
-                </RouterLink>
-                
-                <button 
-                  @click="handleDelete(event.id)" 
-                  class="btn-action delete"
-                  title="Excluir"
-                >
-                  <font-awesome-icon icon="trash" />
-                </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+    <div v-else class="content-wrapper">
+      
+      <div v-if="eventStore.events.length > 0" class="table-card">
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Evento</th>
+                <th>Data</th>
+                <th>Categoria</th>
+                <th class="text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="event in eventStore.events" :key="event.id">
+                <td>
+                  <div class="event-cell">
+                    <strong>{{ event.title }}</strong>
+                    <small class="location-text">
+                      <font-awesome-icon icon="map-marker-alt" /> {{ event.location }}
+                    </small>
+                  </div>
+                </td>
+                <td class="date-cell">
+                  {{ formatDate(event.date) }}
+                </td>
+                <td>
+                  <span class="badge">{{ event.category?.name || 'Sem Categoria' }}</span>
+                </td>
+                <td class="actions-cell">
+                  <RouterLink 
+                    :to="{ name: Routes.EDIT_EVENT, params: { id: event.id } }" 
+                    class="btn-action edit"
+                    title="Editar"
+                  >
+                    <font-awesome-icon icon="pen-to-square" />
+                  </RouterLink>
+                  
+                  <button 
+                    @click="handleDelete(event.id)" 
+                    class="btn-action delete"
+                    title="Excluir"
+                  >
+                    <font-awesome-icon icon="trash" />
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
 
-    <div v-else class="empty-state">
-      <p>Nenhum evento encontrado no sistema.</p>
+      <div v-else class="empty-state">
+        <p>Nenhum evento encontrado no sistema.</p>
+      </div>
+
+      <div v-if="eventStore.totalPages > 1" class="pagination-controls">
+        <button 
+          :disabled="eventStore.page === 1" 
+          @click="changePage(eventStore.page - 1)"
+          class="btn-page"
+        >
+          <font-awesome-icon icon="chevron-left" /> 
+        </button>
+
+        <span class="page-info">
+           {{ eventStore.page }} / {{ eventStore.totalPages }}
+        </span>
+
+        <button 
+          :disabled="eventStore.page === eventStore.totalPages" 
+          @click="changePage(eventStore.page + 1)"
+          class="btn-page"
+        >
+          <font-awesome-icon icon="chevron-right" />
+        </button>
+      </div>
+
     </div>
   </main>
 </template>
@@ -74,21 +101,39 @@ import { useEventStore } from '@/stores/event.store'
 import { RouterLink } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import { formatDate } from '@/utils/formatDate'
+import { Routes } from '@/constants/routeNames'
 
 const eventStore = useEventStore()
 const isLoading = ref(true)
 const toast = useToast()
+const ITEMS_PER_PAGE = 10 
 
 onMounted(async () => {
-  await eventStore.fetchAllEvents(undefined, 1, 100)
-  isLoading.value = false
+  await loadEvents(1)
 })
+
+async function loadEvents(page: number) {
+  isLoading.value = true
+  try {
+    await eventStore.fetchAllEvents(undefined, page, ITEMS_PER_PAGE)
+  } catch (error) {
+    toast.error("Erro ao carregar eventos.")
+  } finally {
+    isLoading.value = false
+  }
+}
+
+async function changePage(newPage: number) {
+  await loadEvents(newPage)
+  document.querySelector('.container')?.scrollIntoView({ behavior: 'smooth' })
+}
 
 async function handleDelete(id: string) {
   if (confirm('Admin: Tem certeza que deseja excluir este evento?')) {
     try {
       await eventStore.deleteEvent(id)
       toast.success('Evento excluído com sucesso.')
+      await loadEvents(eventStore.page) 
     } catch (error) {
       toast.error('Erro ao excluir evento.')
     }
@@ -128,6 +173,7 @@ h1 {
   box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   border: 1px solid #f0f0f0;
   overflow: hidden; 
+  margin-bottom: 2rem;
 }
 
 .table-responsive {
@@ -241,5 +287,44 @@ h1 {
   color: #666;
   background: #f8f9fa;
   border-radius: 8px;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn-page {
+  background-color: white;
+  border: 1px solid #ddd;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #555;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.btn-page:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-page:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f9f9f9;
+}
+
+.page-info {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
 }
 </style>

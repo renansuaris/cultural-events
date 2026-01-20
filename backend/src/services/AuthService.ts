@@ -1,6 +1,5 @@
 import { compare } from "bcryptjs";
 import { sign } from "jsonwebtoken";
-import { AppDataSource } from "../config/data-source";
 import { User } from "../entities/User";
 import { InvalidCredentialsError } from "../errors/AppErrors";
 import { Repository } from "typeorm/repository/Repository";

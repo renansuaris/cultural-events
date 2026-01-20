@@ -34,7 +34,7 @@
       <div class="login-link">
         <p>
           Já tem uma conta?
-          <RouterLink :to="{ name: 'login' }">Faça login</RouterLink>
+          <RouterLink :to="{ name: Routes.LOGIN }">Faça login</RouterLink>
         </p>
       </div>
     </div>
@@ -48,6 +48,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useToast } from 'vue-toastification'
 import { useRouter, RouterLink } from 'vue-router' 
 import { useFormHandler } from '@/composables/useFormHandler'
+import { Routes } from '@/constants/routeNames'
 
 const name = ref('')
 const email = ref('')

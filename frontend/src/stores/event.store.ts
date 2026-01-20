@@ -1,48 +1,37 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { useAuthStore } from './auth'
-import { type ICategory } from './category.store'
-
-export interface IEvent {
-  id: string
-  title: string
-  date: string
-  location: string
-  description: string
-  userId: string 
-  categoryId: string
-  category?: ICategory
-}
-
-type CreateEventData = {
-  title: string
-  date: string
-  location: string
-  description: string
-  categoryId: string
-}
-
-type UpdateEventData = {
-  title: string
-  date: string
-  location: string
-  description: string
-}
+import EventService from '@/services/EventService'
+import type { Event, CreateEventDTO, UpdateEventDTO } from '@/types'
 
 export const useEventStore = defineStore('event', () => {
   
-  const events = ref<IEvent[]>([])
-  const currentEvent = ref<IEvent | null>(null)
-  const myEvents = ref<IEvent[]>([])
-  const API_URL = 'http://localhost:3000'
+  const events = ref<Event[]>([])
+  const currentEvent = ref<Event | null>(null)
+  const myEvents = ref<Event[]>([])
 
-  async function fetchAllEvents() {
+  const page = ref(1)
+  const totalPages = ref(1)
+
+  async function fetchAllEvents(categoryId?: string, pageNumber = 1, limit = 6, search?: string) {
     try {
-      const response = await fetch(`${API_URL}/events?_expand=category`)
-      if (!response.ok) {
-        throw new Error('Erro ao buscar eventos')
+      const params = new URLSearchParams()
+      params.append('page', pageNumber.toString())
+      params.append('limit', limit.toString()) 
+        
+      if (categoryId) {
+        params.append('categoryId', categoryId)
       }
-      events.value = await response.json()
+
+      if (search) {
+        params.append('title', search)
+      }
+
+      const data = await EventService.getAll(params)
+        
+      events.value = data.data
+      page.value = data.page
+      totalPages.value = data.lastPage
     } catch (error) {
       console.error(error)
     }
@@ -51,125 +40,46 @@ export const useEventStore = defineStore('event', () => {
   async function fetchEventById(id: string) {
     currentEvent.value = null 
     try {
-      const response = await fetch(`${API_URL}/events/${id}?_expand=category`)
-      if (!response.ok) {
-        throw new Error('Erro ao buscar o evento')
-      }
-      currentEvent.value = await response.json()
+      const data = await EventService.getById(id)
+      currentEvent.value = data
     } catch (error) {
       console.error(error)
     }
   }
 
-  async function createEvent(eventData: CreateEventData) {
-    const authStore = useAuthStore()
-    const currentUserId = authStore.userId
-
-    if (!currentUserId) {
-      console.error('Usuário não logado, impossível criar evento.')
-      return false 
-    }
-
-    const fullEventData = {
-      ...eventData,
-      userId: currentUserId
-    }
-
-    try {
-      const response = await fetch(`${API_URL}/events`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(fullEventData)
-      })
-
-      if (!response.ok) {
-        throw new Error('Erro ao criar evento')
-      }
-
-      await fetchAllEvents()
-      return true
-    } catch (error) {
-      console.error(error)
-      return false
-    }
+  async function createEvent(eventData: CreateEventDTO) {
+    await EventService.create(eventData)
+    await fetchAllEvents()
+    
+    return true
   }
 
   async function fetchMyEvents() {
     const authStore = useAuthStore()
     const currentUserId = authStore.userId
 
-    if (!currentUserId) {
-      console.warn('Nenhum usuário logado para buscar "Meus Eventos".')
-      return 
-    }
+    if (!currentUserId) return 
 
-    try {
-      const response = await fetch(`${API_URL}/events?userId=${currentUserId}&_expand=category`)
-      if (!response.ok) {
-        throw new Error('Erro ao buscar "Meus Eventos"')
-      }
-      myEvents.value = await response.json()
-    } catch (error) {
-      console.error(error)
-    }
+    const { data } = await EventService.getAll(new URLSearchParams(`userId=${currentUserId}&limit=100`))
+    myEvents.value = data
   }
 
-  async function updateEvent(id: string, eventData: UpdateEventData) {
-
-    if (!currentEvent.value) {
-      console.error('Nenhum evento carregado para atualizar.')
-      return false
-    }
-    const fullEventData = {
-      ...currentEvent.value, 
-      ...eventData             
-    }
-
-    try {
-      const response = await fetch(`${API_URL}/events/${id}`, {
-        method: 'PUT', 
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(fullEventData) 
-      })
-
-      if (!response.ok) {
-        throw new Error('Erro ao atualizar evento')
-      }
-
-      await fetchMyEvents() 
-      
-      return true 
-    } catch (error) {
-      console.error(error)
-      return false 
-    }
+  async function updateEvent(id: string, eventData: UpdateEventDTO) {
+    await EventService.update(id, eventData)
+    await fetchMyEvents() 
   }
 
   async function deleteEvent(id: string) {
-    try {
-      const response = await fetch(`${API_URL}/events/${id}`, {
-        method: 'DELETE' 
-      })
-
-      if (!response.ok) {
-        throw new Error('Erro ao deletar evento')
-      }
-
-      await fetchMyEvents() 
-      
-      return true 
-    } catch (error) {
-      console.error(error)
-      return false 
-    }
+    await EventService.delete(id)
+    events.value = events.value.filter(e => e.id !== id)
+    myEvents.value = myEvents.value.filter(e => e.id !== id)
+    await fetchMyEvents() 
   }
 
   return { 
     events, 
+    page, 
+    totalPages,
     currentEvent,
     myEvents, 
     fetchAllEvents, 

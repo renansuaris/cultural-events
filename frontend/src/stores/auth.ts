@@ -1,173 +1,103 @@
 import { ref, computed } from 'vue' 
 import { defineStore } from 'pinia'
-
-type UserRole = 'admin' | 'user' | null
-
-type RegisterData = {
-  name: string
-  email: string
-  password: string
-}
-
-export interface IUser {
-  id: string
-  name: string
-  email: string
-  role: UserRole
-}
-
-type LoginData = {
-  email: string
-  password: string
-}
+import AuthService from '@/services/AuthService'
+import type { User, UserRole, LoginDTO, RegisterDTO, UpdateProfileDTO } from '@/types'
 
 export const useAuthStore = defineStore('auth', () => {
   
   const isLoggedIn = ref(false)
-  const userRole = ref<UserRole>(null) 
+  const userRole = ref<UserRole | null>(null)
   const userId = ref<string | null>(null)
-  
-  const API_URL = 'http://localhost:3000'
-
-  const usersList = ref<IUser[]>([])
-
+  const userName = ref<string>('')
+  const usersList = ref<User[]>([])
   const isAdmin = computed(() => userRole.value === 'admin')
+
+  async function login(loginData: LoginDTO) {
+    const data = await AuthService.login(loginData)
+    const { user, token } = data
+    
+    setAuthState(user.role, user.id, user.name)
+    localStorage.setItem('token', token)
+    localStorage.setItem('user', JSON.stringify(user)) 
+
+    return user 
+  }
+
+  async function register(registerData: RegisterDTO) {
+    await AuthService.register(registerData)
+  }
+
+  function checkToken() {
+    const token = localStorage.getItem('token')
+    const userStored = localStorage.getItem('user')
+
+    if (token && userStored) {
+      const user = JSON.parse(userStored)
+      setAuthState(user.role, user.id, user.name)
+    } else { 
+      logout() 
+    }
+  }
 
   async function fetchAllUsers() {
     try {
-      const response = await fetch(`${API_URL}/users`)
-      usersList.value = await response.json()
+      const data = await AuthService.fetchAllUsers()
+      usersList.value = data
     } catch (error) {
-      console.error(error)
+      console.error('Falha ao obter usuarios', error)
     }
   }
 
   async function deleteUser(id: string) {
-    try {
-      await fetch(`${API_URL}/users/${id}`, { method: 'DELETE' })
-      await fetchAllUsers() 
-      return true
-    } catch (error) {
-      return false
-    }
-  }
-
-  async function updateUserRole(id: string, newRole: UserRole) {
-    try {
-      await fetch(`${API_URL}/users/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: newRole })
-      })
-      await fetchAllUsers()
-      return true
-    } catch (error) {
-      return false
-    }
-  }
-
-  function setAuthState(role: UserRole, id: string | null) {
-    isLoggedIn.value = true
-    userRole.value = role
-    userId.value = id
+    await AuthService.deleteUser(id)
+    await fetchAllUsers() 
   }
 
   function logout() {
     isLoggedIn.value = false
     userRole.value = null
-    userId.value = null 
+    userId.value = null
+    userName.value = ''
+    
+    localStorage.removeItem('token')
+    localStorage.removeItem('user')
   }
 
-  async function register(registerData: RegisterData) {
-    const { name, email, password } = registerData
-    try {
-      const emailCheck = await fetch(`${API_URL}/users?email=${email}`)
-      const existingUsers = await emailCheck.json()
-
-      if (existingUsers.length > 0) {
-        return { success: false, error: 'Este email já está cadastrado.' }
-      }
-
-      const newUser = {
-        name,
-        email,
-        password,
-        role: 'user' 
-      }
-
-      const response = await fetch(`${API_URL}/users`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newUser)
-      })
-
-      if (!response.ok) {
-        throw new Error('Erro ao registrar no servidor')
-      }
-
-      const createdUser = await response.json()
-
-      setAuthState(createdUser.role, createdUser.id)
-
-      return { success: true }
-    } catch (error) {
-      console.error(error)
-      return { success: false, error: 'Ocorreu um erro de conexão.' }
-    }
+  async function updateUserRole(id: string, newRole: UserRole) {
+    await AuthService.updateRole(id, newRole)
+    await fetchAllUsers()
   }
 
-  async function login(loginData: LoginData) {
-    const { email, password } = loginData
-    try {
-      const response = await fetch(
-        `${API_URL}/users?email=${email}&password=${password}`
-      )
-      const users = await response.json()
-
-      if (users.length === 0) {
-        return { success: false, error: 'Email ou senha inválidos.' }
+  async function updateProfile(id: string, updateData: UpdateProfileDTO) {
+      await AuthService.updateProfile(id, updateData)
+    
+      if (userId.value === id) {
+          userName.value = updateData.name
+          const userStored = JSON.parse(localStorage.getItem('user') || '{}')
+          userStored.name = updateData.name
+          userStored.email = updateData.email
+          localStorage.setItem('user', JSON.stringify(userStored))
       }
-
-      const user = users[0] 
-      setAuthState(user.role, user.id) 
-
-      return { success: true, role: user.role as UserRole, id: user.id }
-    } catch (error) {
-      console.error(error)
-      return { success: false, error: 'Ocorreu um erro de conexão.' }
-    }
   }
 
-  async function updateProfile(id: string, data: { name: string; email: string; password?: string }) {
-    try {
-      const response = await fetch(`${API_URL}/users/${id}`, {
-        method: 'PATCH', 
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-
-      if (!response.ok) {
-        throw new Error('Erro ao atualizar perfil')
-      }
-      return true
-    } catch (error) {
-      console.error(error)
-      return false
-    }
+  function setAuthState(role: UserRole, id: string, name: string) {
+    isLoggedIn.value = true
+    userRole.value = role
+    userId.value = id
+    userName.value = name
   }
 
   return {
     isLoggedIn,
     userRole,
     userId,
+    userName,
     isAdmin,
     usersList,
-    setAuthState,
-    logout,
-    register,
     login,
+    register,
+    logout,
+    checkToken,
     fetchAllUsers,
     deleteUser,
     updateUserRole,

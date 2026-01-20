@@ -1,48 +1,96 @@
 <template>
   <main class="container">
     <div class="header-flex">
-      <h1>Gerenciar Eventos</h1>
-      <RouterLink :to="{ name: 'admin-dashboard' }" class="back-link">&laquo; Voltar ao Painel</RouterLink>
+      <div>
+        <h1>Gerenciar Eventos</h1>
+      </div>
+      <RouterLink :to="{ name: Routes.ADMIN_DASHBOARD }" class="back-link">
+        Voltar ao Painel
+      </RouterLink>
     </div>
 
-    <div v-if="isLoading">Carregando eventos...</div>
-
-    <div v-else-if="eventStore.events.length > 0" class="table-responsive">
-      <table class="admin-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Evento</th>
-            <th>Data</th>
-            <th>Categoria</th> <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="event in eventStore.events" :key="event.id">
-            <td>#{{ event.id }}</td>
-            <td>
-              <strong>{{ event.title }}</strong><br>
-              <small>{{ event.location }}</small>
-            </td>
-            <td>{{ event.date }}</td>
-            <td>
-              <span class="badge">{{ event.category?.name || 'Sem Categoria' }}</span>
-            </td>
-            <td class="actions-cell">
-              <RouterLink :to="{ name: 'edit-event', params: { id: event.id } }" class="btn-icon edit">
-                Editar
-              </RouterLink>
-              <button @click="handleDelete(event.id)" class="btn-icon delete">
-                Excluir
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+    <div v-if="isLoading" class="loading-state">
+      Carregando eventos...
     </div>
 
-    <div v-else>
-      <p>Nenhum evento encontrado no sistema.</p>
+    <div v-else class="content-wrapper">
+      
+      <div v-if="eventStore.events.length > 0" class="table-card">
+        <div class="table-responsive">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Evento</th>
+                <th>Data</th>
+                <th>Categoria</th>
+                <th class="text-right">Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="event in eventStore.events" :key="event.id">
+                <td>
+                  <div class="event-cell">
+                    <strong>{{ event.title }}</strong>
+                    <small class="location-text">
+                      <font-awesome-icon icon="map-marker-alt" /> {{ event.location }}
+                    </small>
+                  </div>
+                </td>
+                <td class="date-cell">
+                  {{ formatDate(event.date) }}
+                </td>
+                <td>
+                  <span class="badge">{{ event.category?.name || 'Sem Categoria' }}</span>
+                </td>
+                <td class="actions-cell">
+                  <RouterLink 
+                    :to="{ name: Routes.EDIT_EVENT, params: { id: event.id } }" 
+                    class="btn-action edit"
+                    title="Editar"
+                  >
+                    <font-awesome-icon icon="pen-to-square" />
+                  </RouterLink>
+                  
+                  <button 
+                    @click="handleDelete(event.id)" 
+                    class="btn-action delete"
+                    title="Excluir"
+                  >
+                    <font-awesome-icon icon="trash" />
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div v-else class="empty-state">
+        <p>Nenhum evento encontrado no sistema.</p>
+      </div>
+
+      <div v-if="eventStore.totalPages > 1" class="pagination-controls">
+        <button 
+          :disabled="eventStore.page === 1" 
+          @click="changePage(eventStore.page - 1)"
+          class="btn-page"
+        >
+          <font-awesome-icon icon="chevron-left" /> 
+        </button>
+
+        <span class="page-info">
+           {{ eventStore.page }} / {{ eventStore.totalPages }}
+        </span>
+
+        <button 
+          :disabled="eventStore.page === eventStore.totalPages" 
+          @click="changePage(eventStore.page + 1)"
+          class="btn-page"
+        >
+          <font-awesome-icon icon="chevron-right" />
+        </button>
+      </div>
+
     </div>
   </main>
 </template>
@@ -51,22 +99,43 @@
 import { ref, onMounted } from 'vue'
 import { useEventStore } from '@/stores/event.store'
 import { RouterLink } from 'vue-router'
+import { useToast } from 'vue-toastification'
+import { formatDate } from '@/utils/formatDate'
+import { Routes } from '@/constants/routeNames'
 
 const eventStore = useEventStore()
 const isLoading = ref(true)
+const toast = useToast()
+const ITEMS_PER_PAGE = 10 
 
 onMounted(async () => {
-  await eventStore.fetchAllEvents()
-  isLoading.value = false
+  await loadEvents(1)
 })
 
+async function loadEvents(page: number) {
+  isLoading.value = true
+  try {
+    await eventStore.fetchAllEvents(undefined, page, ITEMS_PER_PAGE)
+  } catch (error) {
+    toast.error("Erro ao carregar eventos.")
+  } finally {
+    isLoading.value = false
+  }
+}
+
+async function changePage(newPage: number) {
+  await loadEvents(newPage)
+  document.querySelector('.container')?.scrollIntoView({ behavior: 'smooth' })
+}
+
 async function handleDelete(id: string) {
-  if (confirm('Admin: Tem certeza que deseja excluir este evento permanentemente?')) {
-    const success = await eventStore.deleteEvent(id)
-    if (!success) {
-      alert('Erro ao excluir evento.')
-    } else {
-      await eventStore.fetchAllEvents()
+  if (confirm('Admin: Tem certeza que deseja excluir este evento?')) {
+    try {
+      await eventStore.deleteEvent(id)
+      toast.success('Evento excluído com sucesso.')
+      await loadEvents(eventStore.page) 
+    } catch (error) {
+      toast.error('Erro ao excluir evento.')
     }
   }
 }
@@ -86,68 +155,176 @@ async function handleDelete(id: string) {
   margin-bottom: 2rem;
 }
 
+h1 {
+  font-size: 1.8rem;
+  color: #2c3e50;
+  margin-bottom: 0.2rem;
+}
+
 .back-link {
   color: #666;
   text-decoration: none;
 }
 .back-link:hover { text-decoration: underline; }
 
+.table-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  border: 1px solid #f0f0f0;
+  overflow: hidden; 
+  margin-bottom: 2rem;
+}
+
 .table-responsive {
   overflow-x: auto;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 .admin-table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 600px;
-}
-
-.admin-table th, .admin-table td {
-  padding: 1rem;
-  text-align: left;
-  border-bottom: 1px solid #eee;
+  min-width: 700px;
 }
 
 .admin-table th {
-  background-color: #f8f9fa;
-  font-weight: 700;
-  color: #444;
+  background-color: #f9fafb;
+  color: #6b7280;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 1rem 1.5rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.admin-table tr:last-child td { border-bottom: none; }
+.admin-table td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
+  color: #374151;
+}
 
-.badge {
-  background-color: #e9ecef;
-  color: #495057;
-  padding: 4px 8px;
-  border-radius: 4px;
+.admin-table tr:last-child td {
+  border-bottom: none;
+}
+
+.admin-table tr:hover {
+  background-color: #f9fafb; 
+}
+
+.event-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.location-text {
+  color: #9ca3af;
   font-size: 0.85rem;
 }
 
+.date-cell {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: #4b5563;
+}
+
+.badge {
+  background-color: #eff6ff;
+  color: var(--primary);
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid #dbeafe;
+}
+
 .actions-cell {
-  display: flex;
-  gap: 0.5rem;
+  text-align: right;
+  white-space: nowrap;
 }
+.text-right { text-align: right; }
 
-.btn-icon {
-  padding: 6px 12px;
-  border-radius: 4px;
-  text-decoration: none;
-  font-size: 0.9rem;
+.btn-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid transparent;
   cursor: pointer;
-  border: none;
+  transition: all 0.2s;
+  margin-left: 0.5rem;
+  font-size: 0.9rem;
+  text-decoration: none;
 }
 
-.btn-icon.edit {
-  background-color: #ffc107;
-  color: #212529;
+.btn-action.edit {
+  background-color: #f3f4f6;
+  color: #4b5563;
+  border-color: #e5e7eb;
+}
+.btn-action.edit:hover {
+  background-color: #e5e7eb;
+  color: #111827;
+  border-color: #d1d5db;
 }
 
-.btn-icon.delete {
-  background-color: #dc3545;
-  color: white;
+.btn-action.delete {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border-color: #fee2e2;
+}
+.btn-action.delete:hover {
+  background-color: #fee2e2;
+  border-color: #fecaca;
+}
+
+.loading-state, .empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.btn-page {
+  background-color: white;
+  border: 1px solid #ddd;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #555;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all 0.2s;
+}
+
+.btn-page:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.btn-page:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background-color: #f9f9f9;
+}
+
+.page-info {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
 }
 </style>

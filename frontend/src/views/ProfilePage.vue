@@ -9,12 +9,23 @@
       <form v-else @submit.prevent="handleUpdate">
         <div class="form-group">
           <label for="name">Nome Completo:</label>
-          <input type="text" id="name" v-model="name" />
+          <input
+           type="text" 
+           id="name" 
+           v-model="name" 
+           :class="{ 'is-invalid': errors.name }"
+           />
         </div>
 
         <div class="form-group">
           <label for="email">Email:</label>
-          <input type="email" id="email" v-model="email" />
+          <input 
+            type="email" 
+            id="email" 
+            v-model="email" 
+            :class="{ 'is-invalid': errors.email }"
+            />
+            <span v-if="errors.email" class="error-msg">{{ errors.email }}</span>
         </div>
 
         <hr class="divider" />
@@ -23,16 +34,18 @@
 
         <div class="form-group">
           <label for="password">Nova Senha:</label>
-          <input type="password" id="password" v-model="password" placeholder="(Opcional)" />
+          <input type="password" 
+            id="password"
+            v-model="password" 
+            placeholder="(Opcional)" 
+            :class="{ 'is-invalid': errors.password }"
+            />
         </div>
 
         <div class="form-group">
           <label for="confirmPassword">Confirmar Nova Senha:</label>
-          <input type="password" id="confirmPassword" v-model="confirmPassword" />
+          <input type="password" id="confirmPassword" v-model="confirmPassword" :class="{ 'is-invalid': errors.confirmPassword }" />
         </div>
-
-        <p v-if="error" class="error">{{ error }}</p>
-        <p v-if="successMsg" class="success">{{ successMsg }}</p>
 
         <button type="submit" class="btn-submit">Salvar Alterações</button>
       </form>
@@ -43,74 +56,74 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import AuthService from '@/services/AuthService'
+import { useFormHandler } from '@/composables/useFormHandler'
+import { useToast } from 'vue-toastification'
+import type { UpdateProfileDTO } from '@/types'
 
 const authStore = useAuthStore()
-
+const toast = useToast()
 const name = ref('')
 const email = ref('')
 const password = ref('')
 const confirmPassword = ref('')
 
-const isLoading = ref(true)
-const error = ref('')
-const successMsg = ref('')
+const { isLoading, errors, execute } = useFormHandler()
 
 onMounted(async () => {
-  const userId = authStore.userId
-  if (!userId) return
-
   try {
-    const response = await fetch(`http://localhost:3000/users/${userId}`)
-    const user = await response.json()
-    
+    const user = await AuthService.getProfile()
     name.value = user.name
     email.value = user.email
   } catch (err) {
-    error.value = 'Erro ao carregar perfil.'
-  } finally {
-    isLoading.value = false
-  }
+      toast.error('Erro ao carregar perfil.')
+    } 
 })
 
 async function handleUpdate() {
-  error.value = ''
-  successMsg.value = ''
-
-  if (!name.value || !email.value) {
-    error.value = 'Nome e Email são obrigatórios.'
-    return
-  }
-
-  const updateData: any = {
-    name: name.value,
-    email: email.value
-  }
-
   if (password.value) {
     if (password.value !== confirmPassword.value) {
-      error.value = 'As senhas não coincidem.'
+      toast.warning('As senhas não coincidem.')
       return
     }
     if (password.value.length < 6) {
-      error.value = 'A senha deve ter pelo menos 6 caracteres.'
+      toast.warning('A senha deve ter pelo menos 6 caracteres.')
       return
     }
+  }
+
+  const updateData: UpdateProfileDTO = {
+    name: name.value,
+    email: email.value
+  }
+  if (password.value) {
     updateData.password = password.value
   }
 
-  const success = await authStore.updateProfile(authStore.userId!, updateData)
-
-  if (success) {
-    successMsg.value = 'Perfil atualizado com sucesso!'
-    password.value = ''
-    confirmPassword.value = ''
-  } else {
-    error.value = 'Erro ao atualizar perfil.'
-  }
+  await execute(
+    () => authStore.updateProfile(authStore.userId!, updateData),
+    () => {
+      toast.success('Perfil atualizado com sucesso!')
+      password.value = ''
+      confirmPassword.value = ''
+    }
+  )
 }
 </script>
 
 <style scoped>
+  
+.is-invalid {
+  border-color: #dc3545 !important;
+  background-color: #fff8f8;
+}
+.error-msg {
+  color: #dc3545;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
 .form-page-container {
   display: flex;
   justify-content: center;
@@ -166,7 +179,7 @@ p {
 
 .form-group input:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
 }
 
@@ -176,7 +189,7 @@ p {
   font-size: 1.1rem;
   font-weight: 700;
   color: white;
-  background-color: #007bff;
+  background-color: var(--primary);
   border: none;
   border-radius: 4px;
   cursor: pointer;
@@ -185,7 +198,7 @@ p {
 }
 
 .btn-submit:hover {
-  background-color: #0056b3;
+  background-color: var(--primary-hover);
 }
 
 .divider {
@@ -199,19 +212,6 @@ p {
   color: #888;
   margin-bottom: 1rem;
   font-style: italic;
-}
-
-.error {
-  color: #dc3545;
-  font-size: 0.9rem;
-  text-align: center;
-}
-
-.success {
-  color: #28a745;
-  font-size: 0.9rem;
-  text-align: center;
-  font-weight: bold;
 }
 
 .loading {

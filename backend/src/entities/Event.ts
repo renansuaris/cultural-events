@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { User } from './User';
 import { Category } from './Category';
 
@@ -11,8 +11,8 @@ export class Event {
   @Column()
   title: string;
 
-  @Column( {type: "datetime" })
-  date: Date; 
+  @Column()
+  date: string; 
 
   @Column()
   location: string;

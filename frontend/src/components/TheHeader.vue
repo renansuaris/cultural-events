@@ -1,26 +1,26 @@
 <template>
   <header class="main-header">
     <div class="container">
-      <RouterLink :to="{ name: 'home' }" class="logo">
-        Cultural Events
+      <RouterLink :to="{ name: Routes.HOME }" class="logo">
+        Cultural <span class="color">Events</span>
       </RouterLink>
 
       <nav class="main-nav">
-        <RouterLink :to="{ name: 'home' }">Eventos</RouterLink>
+        <RouterLink :to="{ name: Routes.HOME }">Eventos</RouterLink>
 
         <span v-if="auth.isLoggedIn">
-          <RouterLink :to="{ name: 'create-event' }">Criar Evento</RouterLink>
-          <RouterLink v-if="!auth.isAdmin" :to="{ name: 'my-events' }">
+          <RouterLink :to="{ name: Routes.CREATE_EVENT }">Criar Evento</RouterLink>
+          <RouterLink v-if="!auth.isAdmin" :to="{ name: Routes.MY_EVENTS }">
             Meus Eventos
           </RouterLink>
-          <RouterLink :to="{ name: 'profile' }">Minha Conta</RouterLink>
-          <RouterLink v-if="auth.isAdmin" :to="{ name: 'admin-dashboard' }">
+          <RouterLink :to="{ name: Routes.PROFILE }">Minha Conta</RouterLink>
+          <RouterLink v-if="auth.isAdmin" :to="{ name: Routes.ADMIN_DASHBOARD }">
             Admin
           </RouterLink>
           <a @click="handleLogout" href="#">Logout <font-awesome-icon icon="right-from-bracket" /></a>
         </span>
         <span v-else>
-          <RouterLink :to="{ name: 'login' }">Login</RouterLink>
+          <RouterLink :to="{ name: Routes.LOGIN }">Login</RouterLink>
         </span>
       </nav>
     </div>
@@ -30,6 +30,7 @@
 <script setup lang="ts">
 import { RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { Routes } from '@/constants/routeNames'
 
 const auth = useAuthStore()
 const router = useRouter()
@@ -77,6 +78,10 @@ function handleLogout() {
   gap: 1.5rem; 
 }
 
+.color {
+  color: var(--primary); 
+}
+
 .main-nav a {
   text-decoration: none;
   color: #555;
@@ -84,8 +89,9 @@ function handleLogout() {
   cursor: pointer;
   transition: color 0.2s ease;
 }
+
 .main-nav a:hover {
-  color: #007bff;
+  color: var(--primary); 
 }
 .main-nav a[href="#"] {
   color: #dc3545;

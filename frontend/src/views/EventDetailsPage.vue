@@ -3,17 +3,17 @@
     <div v-if="eventStore.currentEvent" class="event-content">
       <h1>{{ eventStore.currentEvent.title }}</h1>
       <div class="event-info">
-        <p><strong>Data:</strong> {{ eventStore.currentEvent.date }}</p>
+        <p><strong>Data:</strong> {{ formatDate(eventStore.currentEvent.date) }}</p>
       <p><strong>Local:</strong> {{ eventStore.currentEvent.location }}</p>
       </div>
       <hr />
       <p class="event-description">{{ eventStore.currentEvent.description }}</p>
 
-      <RouterLink :to="{ name: 'home' }" class="back-link">&laquo; Voltar para a lista</RouterLink>
+      <RouterLink :to="{ name: Routes.HOME }" class="back-link">&laquo; Voltar para a lista</RouterLink>
     </div>
     <div v-else class="loading">
       <h2>Evento não encontrado ou carregando...</h2>
-      <RouterLink :to="{ name: 'home' }">&laquo; Voltar para a lista</RouterLink>
+      <RouterLink :to="{ name: Routes.HOME }">&laquo; Voltar para a lista</RouterLink>
     </div>
   </main>
 </template>
@@ -21,8 +21,9 @@
 <script setup lang="ts">
 import { onMounted } from 'vue'
 import { useRoute, RouterLink } from 'vue-router'
-
+import { formatDate } from '@/utils/formatDate'
 import { useEventStore } from '@/stores/event.store'
+import { Routes } from '@/constants/routeNames'
 
 const eventStore = useEventStore()
 
@@ -82,7 +83,7 @@ hr {
 
 .back-link {
   text-decoration: none;
-  color: #007bff;
+  color: var(--primary);
   font-weight: 700;
 }
 .back-link:hover {

@@ -3,13 +3,17 @@ import { DataSource } from 'typeorm';
 import { User } from '../entities/User';
 import { Event } from '../entities/Event';
 import { Category } from '../entities/Category';
+import dotenv from 'dotenv';
+
+dotenv.config(); 
 
 export const AppDataSource = new DataSource({
-  type: 'sqlite', 
-  database: 'database.sqlite', 
+  type: 'postgres', 
+  url: process.env.DATABASE_URL, 
   synchronize: true, 
-  logging: true, 
+  logging: false, 
   entities: [User, Event, Category], 
   migrations: [],
   subscribers: [],
+  ssl: { rejectUnauthorized: false } 
 });
